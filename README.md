@@ -1,7 +1,5 @@
 # invest_calculator_render
 
-可直接部署在 Render 的版本，不依賴 Firebase Functions / Firestore。
-
 ## Features
 - 靜態頁面：`/`
 - 健康檢查：`/healthz`
