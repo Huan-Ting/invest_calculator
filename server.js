@@ -5,7 +5,7 @@ const crypto = require('node:crypto');
 const app = express();
 
 const PORT = Number(process.env.PORT || 3000);
-const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 8000);
+const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 15000);
 const FETCH_RETRY_COUNT = Number(process.env.FETCH_RETRY_COUNT || 3);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 12 * 60 * 60 * 1000);
 const ALLOWED_SYMBOLS = new Set(['0050.TW', 'QQQ', 'VTI', 'VT']);
@@ -15,24 +15,20 @@ const athCache = new Map();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-function withTimeout(promise, ms = REQUEST_TIMEOUT_MS) {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('timeout')), ms);
-    promise.then(
-      (value) => {
-        clearTimeout(timer);
-        resolve(value);
-      },
-      (error) => {
-        clearTimeout(timer);
-        reject(error);
-      },
-    );
-  });
-}
-
 async function fetchJson(url) {
-  const response = await withTimeout(fetch(url, { cache: 'no-store' }));
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const response = await fetch(url, {
+    cache: 'no-store',
+    signal: controller.signal,
+    headers: {
+      'user-agent': 'Mozilla/5.0 (compatible; invest-calculator-render/1.0)',
+      accept: 'application/json,text/plain,*/*',
+      'accept-language': 'en-US,en;q=0.9',
+    },
+  }).finally(() => {
+    clearTimeout(timer);
+  });
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }
@@ -77,17 +73,29 @@ function hashPayload(data) {
 }
 
 async function fetchAthFromYahoo(symbol) {
-  const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=max&interval=1d`;
-  const data = await fetchJsonWithRetry(yahooUrl);
-  const ath = getMaxCloseFromYahooChart(data);
+  const encoded = encodeURIComponent(symbol);
+  const urls = [
+    `https://query1.finance.yahoo.com/v8/finance/chart/${encoded}?range=max&interval=1d`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${encoded}?range=max&interval=1d`,
+  ];
 
-  return {
-    symbol,
-    ath,
-    source: 'yahoo-chart-max-close',
-    sourcePayloadHash: hashPayload(data),
-    asOf: new Date().toISOString(),
-  };
+  let lastError = null;
+  for (const yahooUrl of urls) {
+    try {
+      const data = await fetchJsonWithRetry(yahooUrl);
+      const ath = getMaxCloseFromYahooChart(data);
+      return {
+        symbol,
+        ath,
+        source: `yahoo-chart-max-close:${new URL(yahooUrl).host}`,
+        sourcePayloadHash: hashPayload(data),
+        asOf: new Date().toISOString(),
+      };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error('all yahoo upstreams failed');
 }
 
 function sendError(res, status, code, message) {
@@ -143,7 +151,11 @@ app.get('/api/ath', async (req, res) => {
       asOf: upstream.asOf,
       cached: false,
     });
-  } catch (_error) {
+  } catch (error) {
+    console.error('[/api/ath] upstream failed', {
+      symbol,
+      message: error?.message || 'unknown error',
+    });
     return sendError(res, 502, 'UPSTREAM_ERROR', 'Failed to fetch upstream history');
   }
 });
