@@ -111,10 +111,10 @@
 
 <script>
 const ETFs=[
-  {id:'tw50',name:'Taiwan50',currency:'NT$',divs:5,ranges:[[6,8],[8,10],[10,12],[12,14],[14,16]],needKey:'ntd',quoteSymbol:'0050.TW'},
-  {id:'qqq',name:'QQQ',currency:'USD',divs:12,ranges:[[6,7],[7,8],[8,10],[10,15],[15,20]],needKey:'usd',quoteSymbol:'QQQ'},
-  {id:'vti',name:'VTI',currency:'USD',divs:12,ranges:[[6,7],[7,8],[8,10],[10,15],[15,20]],needKey:'usd',quoteSymbol:'VTI'},
-  {id:'vt',name:'VT',currency:'USD',divs:12,ranges:[[6,7],[7,8],[8,10],[10,15],[15,20]],needKey:'usd',quoteSymbol:'VT'},
+  {id:'tw50',name:'Taiwan50',currency:'NT$',divs:5,ranges:[[5,7],[7,10],[10,20],[20,30]],needKey:'ntd',quoteSymbol:'0050.TW'},
+  {id:'qqq',name:'QQQ',currency:'USD',divs:12,ranges:[[7,10],[10,13],[13,20]],needKey:'usd',quoteSymbol:'QQQ'},
+  {id:'vti',name:'VTI',currency:'USD',divs:12,ranges:[[7,10],[10,13],[13,20]],needKey:'usd',quoteSymbol:'VTI'},
+  {id:'vt',name:'VT',currency:'USD',divs:12,ranges:[[7,10],[10,13],[13,20]],needKey:'usd',quoteSymbol:'VT'},
 ];
 
 const STORAGE_KEY='inv_plan_v3';
@@ -318,7 +318,9 @@ function calc(){
   nEtfUsdEl.textContent=(needEtfUsd>=0?'+$':'−$')+Math.round(Math.abs(needEtfUsd)).toLocaleString();
   nEtfUsdEl.style.color=colorVal(needEtfUsd);
 
-  const dropWeights=[6.6,20,20,35,18.4];
+  const qqqWeights=[43,36,21];
+  const vtiVtWeights=[43,36,21];
+  const tw50Weights=[5,30,30,25];
 
   ETFs.forEach(etf=>{
     const needVal=etf.needKey==='ntd'?needNtd:needUsd;
@@ -333,10 +335,12 @@ function calc(){
       const key=`${etf.id}_${i}`;
       if(actual[key]===undefined)actual[key]='';
       let expectedInvest=perTime;
-      if(etf.id==='qqq'){
-        expectedInvest=needEtfUsd*0.5*(dropWeights[i]/100);
+      if(etf.id==='tw50'){
+        expectedInvest=needNtd*(tw50Weights[i]/100);
+      }else if(etf.id==='qqq'){
+        expectedInvest=needEtfUsd*0.5*(qqqWeights[i]/100);
       }else if(etf.id==='vti'||etf.id==='vt'){
-        expectedInvest=needEtfUsd*0.25*(dropWeights[i]/100);
+        expectedInvest=needEtfUsd*0.25*(vtiVtWeights[i]/100);
       }
       const tr=document.createElement('tr');
       tr.style.borderBottom='0.5px solid var(--color-border-tertiary)';
