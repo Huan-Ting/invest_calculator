@@ -344,8 +344,8 @@ function calc(){
   remainingEl.textContent=(remaining>=0?'+':'')+Math.round(remaining).toLocaleString()+' NT$';
   remainingEl.style.color=colorVal(remaining);
 
-  const qqqWeights=[43,36,21];
-  const vtiVtWeights=[43,36,21];
+  const qqqWeights=[40,40,20];
+  const vtiVtWeights=[40,40,20];
   const tw50Weights=[5,30,30,25];
 
   ETFs.forEach(etf=>{
@@ -375,7 +375,7 @@ function calc(){
         <td style="padding:7px 4px;font-weight:500;color:var(--color-text-primary)">${fmt(priceLo,etf.currency)}</td>
         <td style="padding:7px 4px;font-weight:500;color:var(--color-text-primary)">${fmt(priceHi,etf.currency)}</td>
         <td style="padding:7px 4px;color:var(--color-text-secondary)">${fmtBig(expectedInvest,etf.currency)}</td>
-        <td style="padding:7px 4px"><input type="number" placeholder="0" value="${actual[key]}" style="width:100%;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 6px;background:var(--color-background-secondary);color:var(--color-text-primary)" oninput="actual['${key}']=this.value;calc();saveState()"></td>`;
+        <td style="padding:7px 4px"><input type="number" placeholder="0" value="${actual[key]}" style="width:100%;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 6px;background:var(--color-background-secondary);color:var(--color-text-primary)" oninput="actual['${key}']=this.value" onblur="calc();saveState()"></td>`;
       tbody.appendChild(tr);
     });
   });
