@@ -88,7 +88,7 @@
     </div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:2rem">
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:2rem">
     <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
       <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">需再投入台幣</div>
       <div id="need_ntd_display" style="font-size:20px;font-weight:500">—</div>
@@ -103,6 +103,16 @@
       <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">需再投入ETF美金</div>
       <div id="need_etf_usd_display" style="font-size:20px;font-weight:500">—</div>
       <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">需再投入美金 × 目標 ETF 佔比 (%)</div>
+    </div>
+    <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">目前投入</div>
+      <div id="current_invest_display" style="font-size:20px;font-weight:500">—</div>
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">四個標的實際投入加總</div>
+    </div>
+    <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary);grid-column:span 2">
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">目前剩餘</div>
+      <div id="remaining_display" style="font-size:20px;font-weight:500">—</div>
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">需再投入台幣 − 目前投入</div>
     </div>
   </div>
 
@@ -311,12 +321,28 @@ function calc(){
   const nNtdEl=document.getElementById('need_ntd_display');
   const nUsdEl=document.getElementById('need_usd_display');
   const nEtfUsdEl=document.getElementById('need_etf_usd_display');
+  const currentInvestEl=document.getElementById('current_invest_display');
+  const remainingEl=document.getElementById('remaining_display');
   nNtdEl.textContent=(needNtd>=0?'+':'')+Math.round(needNtd).toLocaleString()+' NT$';
   nNtdEl.style.color=colorVal(needNtd);
   nUsdEl.textContent=(needUsd>=0?'+$':'−$')+Math.round(Math.abs(needUsd)).toLocaleString();
   nUsdEl.style.color=colorVal(needUsd);
   nEtfUsdEl.textContent=(needEtfUsd>=0?'+$':'−$')+Math.round(Math.abs(needEtfUsd)).toLocaleString();
   nEtfUsdEl.style.color=colorVal(needEtfUsd);
+
+  let currentInvest=0;
+  ETFs.forEach(etf=>{
+    etf.ranges.forEach((_,i)=>{
+      const key=`${etf.id}_${i}`;
+      const v=parseFloat(actual[key]);
+      if(Number.isFinite(v)) currentInvest+=v;
+    });
+  });
+  const remaining=needNtd-currentInvest;
+  currentInvestEl.textContent=Math.round(currentInvest).toLocaleString()+' NT$';
+  currentInvestEl.style.color='var(--color-text-primary)';
+  remainingEl.textContent=(remaining>=0?'+':'')+Math.round(remaining).toLocaleString()+' NT$';
+  remainingEl.style.color=colorVal(remaining);
 
   const qqqWeights=[43,36,21];
   const vtiVtWeights=[43,36,21];
