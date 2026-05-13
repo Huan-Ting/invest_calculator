@@ -99,6 +99,11 @@
       <div id="need_usd_display" style="font-size:20px;font-weight:500">—</div>
       <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">現有美金現金 − 目標美金現金</div>
     </div>
+    <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">需再投入ETF美金</div>
+      <div id="need_etf_usd_display" style="font-size:20px;font-weight:500">—</div>
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">需再投入美金 × 目標 ETF 佔比 (%)</div>
+    </div>
   </div>
 
   <div id="targets" style="display:flex;flex-direction:column;gap:1.5rem"></div>
@@ -107,9 +112,9 @@
 <script>
 const ETFs=[
   {id:'tw50',name:'Taiwan50',currency:'NT$',divs:5,ranges:[[6,8],[8,10],[10,12],[12,14],[14,16]],needKey:'ntd',quoteSymbol:'0050.TW'},
-  {id:'qqq',name:'QQQ',currency:'USD',divs:12,ranges:[[6,8],[8,10],[10,12],[12,14],[14,16]],needKey:'usd',quoteSymbol:'QQQ'},
-  {id:'vti',name:'VTI',currency:'USD',divs:12,ranges:[[6,8],[8,10],[10,12],[12,14]],needKey:'usd',quoteSymbol:'VTI'},
-  {id:'vt',name:'VT',currency:'USD',divs:12,ranges:[[6,8],[8,10],[10,12],[12,14]],needKey:'usd',quoteSymbol:'VT'},
+  {id:'qqq',name:'QQQ',currency:'USD',divs:12,ranges:[[6,7],[7,8],[8,10],[10,15],[15,20]],needKey:'usd',quoteSymbol:'QQQ'},
+  {id:'vti',name:'VTI',currency:'USD',divs:12,ranges:[[6,7],[7,8],[8,10],[10,15],[15,20]],needKey:'usd',quoteSymbol:'VTI'},
+  {id:'vt',name:'VT',currency:'USD',divs:12,ranges:[[6,7],[7,8],[8,10],[10,15],[15,20]],needKey:'usd',quoteSymbol:'VT'},
 ];
 
 const STORAGE_KEY='inv_plan_v3';
@@ -274,7 +279,6 @@ function buildTargets(){
           <span style="font-size:11px;color:var(--color-text-secondary)">${etf.currency}</span>
         </div>
         <div id="price_meta_${etf.id}" style="font-size:11px;color:var(--color-text-secondary)">使用目前儲存值</div>
-        <div style="margin-left:auto;font-size:12px;color:var(--color-text-secondary)">每次期望投入：<span id="per_${etf.id}" style="font-weight:500;color:var(--color-text-primary)">—</span></div>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed">
         <colgroup><col style="width:72px"><col style="width:88px"><col style="width:88px"><col style="width:96px"><col></colgroup>
@@ -296,23 +300,29 @@ function buildTargets(){
 function calc(){
   const tNtd=parseFloat(document.getElementById('target_ntd').value)||0;
   const tUsd=parseFloat(document.getElementById('target_usd').value)||0;
+  const etfPct=(parseFloat(document.getElementById('etf_pct').value)||0)/100;
   const cNtd=parseFloat(document.getElementById('cur_ntd').value)||0;
   const cUsd=parseFloat(document.getElementById('cur_usd').value)||0;
 
   const needNtd=cNtd-tNtd;
   const needUsd=cUsd-tUsd;
+  const needEtfUsd=needUsd*etfPct;
 
   const nNtdEl=document.getElementById('need_ntd_display');
   const nUsdEl=document.getElementById('need_usd_display');
+  const nEtfUsdEl=document.getElementById('need_etf_usd_display');
   nNtdEl.textContent=(needNtd>=0?'+':'')+Math.round(needNtd).toLocaleString()+' NT$';
   nNtdEl.style.color=colorVal(needNtd);
   nUsdEl.textContent=(needUsd>=0?'+$':'−$')+Math.round(Math.abs(needUsd)).toLocaleString();
   nUsdEl.style.color=colorVal(needUsd);
+  nEtfUsdEl.textContent=(needEtfUsd>=0?'+$':'−$')+Math.round(Math.abs(needEtfUsd)).toLocaleString();
+  nEtfUsdEl.style.color=colorVal(needEtfUsd);
+
+  const dropWeights=[6.6,20,20,35,18.4];
 
   ETFs.forEach(etf=>{
     const needVal=etf.needKey==='ntd'?needNtd:needUsd;
     const perTime=needVal/etf.divs;
-    document.getElementById('per_'+etf.id).textContent=fmtBig(perTime,etf.currency);
 
     const p=prices[etf.id]||0;
     const tbody=document.getElementById('rows_'+etf.id);
@@ -322,13 +332,19 @@ function calc(){
       const priceHi=p*(1-lo/100);
       const key=`${etf.id}_${i}`;
       if(actual[key]===undefined)actual[key]='';
+      let expectedInvest=perTime;
+      if(etf.id==='qqq'){
+        expectedInvest=needEtfUsd*0.5*(dropWeights[i]/100);
+      }else if(etf.id==='vti'||etf.id==='vt'){
+        expectedInvest=needEtfUsd*0.25*(dropWeights[i]/100);
+      }
       const tr=document.createElement('tr');
       tr.style.borderBottom='0.5px solid var(--color-border-tertiary)';
       tr.innerHTML=`
         <td style="padding:7px 4px;color:var(--color-text-secondary)">${lo}–${hi}%</td>
         <td style="padding:7px 4px;font-weight:500;color:var(--color-text-primary)">${fmt(priceLo,etf.currency)}</td>
         <td style="padding:7px 4px;font-weight:500;color:var(--color-text-primary)">${fmt(priceHi,etf.currency)}</td>
-        <td style="padding:7px 4px;color:var(--color-text-secondary)">${fmtBig(perTime,etf.currency)}</td>
+        <td style="padding:7px 4px;color:var(--color-text-secondary)">${fmtBig(expectedInvest,etf.currency)}</td>
         <td style="padding:7px 4px"><input type="number" placeholder="0" value="${actual[key]}" style="width:100%;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 6px;background:var(--color-background-secondary);color:var(--color-text-primary)" oninput="actual['${key}']=this.value;saveState()"></td>`;
       tbody.appendChild(tr);
     });
