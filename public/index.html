@@ -39,12 +39,77 @@
     background: var(--color-background-primary);
     color: var(--color-text-primary);
     padding: 1.5rem;
-    max-width: 860px;
+    max-width: 1400px;
     margin: 0 auto;
     font-size: 16px;
     line-height: 1.5;
   }
   h1 { font-size: 18px; font-weight: 500; margin-bottom: 1.5rem; }
+  .layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .panel {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem;
+  }
+  .section-title {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-bottom: 12px;
+  }
+  .top-input-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .summary-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .summary-note {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .targets-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .stock-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .target-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem;
+  }
+  @media (max-width: 1100px) {
+    .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .targets-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 720px) {
+    .summary-grid { grid-template-columns: 1fr; }
+    .top-input-row { grid-template-columns: 1fr; }
+  }
   input[type=number] { font-family: var(--font-sans); }
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
@@ -54,9 +119,12 @@
 
 <h1>投資計劃試算器</h1>
 
-<div style="padding:0.5rem 0">
+<div class="layout">
+<div class="panel">
+  <div class="top-input-row">
+  <div>
 
-  <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">目標配置</div>
+  <div class="section-title">目標配置</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem">
     <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.875rem">
       <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">目標台幣現金 (NT$)</div>
@@ -75,8 +143,10 @@
       <input type="number" id="stk_pct" value="30" style="width:100%;font-size:14px;font-weight:500;border:none;background:transparent;color:var(--color-text-primary);outline:none" oninput="calc()">
     </div>
   </div>
+  </div>
+  <div>
 
-  <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">最新月份現有現金（來自月度總覽）</div>
+  <div class="section-title">最新月份現有現金（來自月度總覽）</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem">
     <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.875rem">
       <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">現有台幣現金 (NT$)</div>
@@ -87,36 +157,78 @@
       <input type="number" id="cur_usd" value="0" style="width:100%;font-size:14px;font-weight:500;border:none;background:transparent;color:var(--color-text-primary);outline:none" oninput="calc()">
     </div>
   </div>
+  </div>
+  </div>
+</div>
 
-  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:2rem">
+<div class="panel">
+  <div class="section-title">投資摘要與建議投入</div>
+  <div class="summary-grid">
     <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">需再投入台幣</div>
+      <div class="summary-head">
+        <div style="font-size:11px;color:var(--color-text-secondary)">需再投入台幣</div>
+        <div class="summary-note">（現有台幣現金 − 目標台幣現金）</div>
+      </div>
       <div id="need_ntd_display" style="font-size:20px;font-weight:500">—</div>
-      <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">現有台幣現金 − 目標台幣現金</div>
     </div>
     <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">需再投入美金</div>
+      <div class="summary-head">
+        <div style="font-size:11px;color:var(--color-text-secondary)">需再投入美金</div>
+        <div class="summary-note">（現有美金現金 − 目標美金現金）</div>
+      </div>
       <div id="need_usd_display" style="font-size:20px;font-weight:500">—</div>
-      <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">現有美金現金 − 目標美金現金</div>
     </div>
     <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">需再投入ETF美金</div>
+      <div class="summary-head">
+        <div style="font-size:11px;color:var(--color-text-secondary)">需再投入ETF美金</div>
+        <div class="summary-note">（需再投入美金 × 目標 ETF 佔比）</div>
+      </div>
       <div id="need_etf_usd_display" style="font-size:20px;font-weight:500">—</div>
-      <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">需再投入美金 × 目標 ETF 佔比 (%)</div>
     </div>
     <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">目前投入</div>
+      <div class="summary-head">
+        <div style="font-size:11px;color:var(--color-text-secondary)">目前投入</div>
+        <div class="summary-note">（四個標的實際投入加總）</div>
+      </div>
       <div id="current_invest_display" style="font-size:20px;font-weight:500">—</div>
-      <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">四個標的實際投入加總</div>
     </div>
     <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary);grid-column:span 2">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">目前剩餘</div>
+      <div class="summary-head">
+        <div style="font-size:11px;color:var(--color-text-secondary)">目前剩餘</div>
+        <div class="summary-note">（需再投入台幣 − 目前投入）</div>
+      </div>
       <div id="remaining_display" style="font-size:20px;font-weight:500">—</div>
-      <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">需再投入台幣 − 目前投入</div>
     </div>
   </div>
 
-  <div id="targets" style="display:flex;flex-direction:column;gap:1.5rem"></div>
+  <div id="targets" class="targets-grid"></div>
+</div>
+
+<div class="panel">
+  <div class="section-title">個股追蹤</div>
+  <div class="stock-toolbar">
+    <input id="stock_symbol_input" type="text" placeholder="輸入股票代號，例如 AAPL" style="min-width:220px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 8px;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none">
+    <button id="add_stock_btn" type="button" style="font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 10px;background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer">新增個股</button>
+    <div id="stock_panel_meta" style="font-size:11px;color:var(--color-text-secondary)">可自行新增喜歡的個股</div>
+  </div>
+  <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed">
+      <colgroup><col style="width:120px"><col style="width:160px"><col style="width:140px"><col style="width:120px"><col style="width:160px"><col style="width:90px"></colgroup>
+      <thead>
+        <tr style="border-bottom:0.5px solid var(--color-border-tertiary)">
+          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">個股</th>
+          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">一年內最高價</th>
+          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">目前價格</th>
+          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">成長率</th>
+          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">實際投入</th>
+          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">操作</th>
+        </tr>
+      </thead>
+      <tbody id="stock_rows"></tbody>
+    </table>
+  </div>
+  <div style="margin-top:10px;font-size:13px;color:var(--color-text-secondary)">目前投入：<span id="stock_current_invest_display" style="font-weight:500;color:var(--color-text-primary)">0</span></div>
+</div>
 </div>
 
 <script>
@@ -133,6 +245,11 @@ const prices={tw50:81,qqq:635,vti:343,vt:148.9};
 const actual={};
 const API_BASE_URL=window.__API_BASE_URL__||'';
 const FETCH_RETRY_COUNT=3;
+const STOCK_SYMBOL_PATTERN=/^[A-Za-z0-9.\-]{1,15}$/;
+const DEFAULT_STOCKS=['AAPL','MSFT','TSLA'];
+const likedStocks=[];
+const stockSnapshot={};
+const stockActual={};
 
 function withTimeout(promise,ms=8000){
   return new Promise((resolve,reject)=>{
@@ -158,6 +275,9 @@ function saveState(){
     cur_usd:document.getElementById('cur_usd').value,
     prices:{...prices},
     actual:{...actual},
+    likedStocks:[...likedStocks],
+    stockSnapshot:{...stockSnapshot},
+    stockActual:{...stockActual},
   };
   try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }
   catch(e){}
@@ -171,6 +291,15 @@ function restoreState(){
   });
   if(s.prices) Object.assign(prices,s.prices);
   if(s.actual) Object.assign(actual,s.actual);
+  const restoredStocks=Array.isArray(s.likedStocks)&&s.likedStocks.length?s.likedStocks:DEFAULT_STOCKS;
+  restoredStocks.forEach(symbol=>{
+    const normalized=String(symbol||'').trim().toUpperCase();
+    if(normalized&&STOCK_SYMBOL_PATTERN.test(normalized)&&!likedStocks.includes(normalized)){
+      likedStocks.push(normalized);
+    }
+  });
+  if(s.stockSnapshot&&typeof s.stockSnapshot==='object') Object.assign(stockSnapshot,s.stockSnapshot);
+  if(s.stockActual&&typeof s.stockActual==='object') Object.assign(stockActual,s.stockActual);
 }
 
 function fmt(n,curr){
@@ -238,9 +367,132 @@ function formatPriceUpdateTime(date){
     second:'2-digit',
   }).format(date);
 }
+function formatStockNumber(value){
+  if(!Number.isFinite(value)) return '—';
+  return value.toFixed(2);
+}
+function formatStockGrowth(value){
+  if(!Number.isFinite(value)) return '—';
+  const sign=value>0?'+':'';
+  return `${sign}${value.toFixed(2)}%`;
+}
 
 function roundPriceForDisplay(price,currency){
   return currency==='NT$'?Math.round(price):Number(price.toFixed(2));
+}
+
+function setStockPanelMeta(text,color='var(--color-text-secondary)'){
+  const el=document.getElementById('stock_panel_meta');
+  if(!el) return;
+  el.textContent=text;
+  el.style.color=color;
+}
+
+async function fetchStockSnapshot(symbol){
+  const endpoint=`${API_BASE_URL}/api/stock?symbol=${encodeURIComponent(symbol)}`;
+  const data=await fetchJsonWithRetry(endpoint);
+  const yearHigh=Number(data?.yearHigh);
+  const currentPrice=Number(data?.currentPrice);
+  const growthRate=Number(data?.growthRate);
+  if(!Number.isFinite(yearHigh)||!Number.isFinite(currentPrice)||!Number.isFinite(growthRate)){
+    throw new Error('invalid stock snapshot');
+  }
+  return {yearHigh,currentPrice,growthRate};
+}
+
+function renderStocks(){
+  const tbody=document.getElementById('stock_rows');
+  tbody.innerHTML='';
+  likedStocks.forEach(symbol=>{
+    const row=document.createElement('tr');
+    row.style.borderBottom='0.5px solid var(--color-border-tertiary)';
+    const snapshot=stockSnapshot[symbol]||{};
+    const growthRate=Number(snapshot.growthRate);
+    row.innerHTML=`
+      <td style="padding:8px 4px;font-weight:500;color:var(--color-text-primary)">${symbol}</td>
+      <td style="padding:8px 4px;color:var(--color-text-primary)">${formatStockNumber(Number(snapshot.yearHigh))}</td>
+      <td style="padding:8px 4px;color:var(--color-text-primary)">${formatStockNumber(Number(snapshot.currentPrice))}</td>
+      <td style="padding:8px 4px;color:${colorVal(growthRate)}">${formatStockGrowth(growthRate)}</td>
+      <td style="padding:8px 4px"><input type="number" placeholder="0" value="${stockActual[symbol]??''}" style="width:100%;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 6px;background:var(--color-background-secondary);color:var(--color-text-primary)" oninput="stockActual['${symbol}']=this.value;updateStockCurrentInvestDisplay();saveState()"></td>
+      <td style="padding:8px 4px"><button type="button" style="font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 8px;background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer" onclick="removeStock('${symbol}')">移除</button></td>
+    `;
+    tbody.appendChild(row);
+  });
+  updateStockCurrentInvestDisplay();
+}
+
+function updateStockCurrentInvestDisplay(){
+  let total=0;
+  likedStocks.forEach(symbol=>{
+    const value=parseFloat(stockActual[symbol]);
+    if(Number.isFinite(value)) total+=value;
+  });
+  document.getElementById('stock_current_invest_display').textContent=total.toLocaleString();
+}
+
+function addStock(symbol){
+  const normalized=String(symbol||'').trim().toUpperCase();
+  if(!normalized){
+    setStockPanelMeta('請輸入個股代號','var(--color-text-danger)');
+    return;
+  }
+  if(!STOCK_SYMBOL_PATTERN.test(normalized)){
+    setStockPanelMeta('代號格式錯誤','var(--color-text-danger)');
+    return;
+  }
+  if(likedStocks.includes(normalized)){
+    setStockPanelMeta(`${normalized} 已存在`,'var(--color-text-danger)');
+    return;
+  }
+  likedStocks.push(normalized);
+  renderStocks();
+  refreshStocks([normalized]);
+  saveState();
+}
+
+function removeStock(symbol){
+  const index=likedStocks.indexOf(symbol);
+  if(index===-1) return;
+  likedStocks.splice(index,1);
+  delete stockSnapshot[symbol];
+  delete stockActual[symbol];
+  renderStocks();
+  saveState();
+}
+
+window.removeStock=removeStock;
+
+async function refreshStocks(targetSymbols){
+  const symbols=Array.isArray(targetSymbols)&&targetSymbols.length?targetSymbols:[...likedStocks];
+  if(!symbols.length){
+    setStockPanelMeta('尚未設定個股');
+    return;
+  }
+  setStockPanelMeta('個股資料更新中...');
+  const results=await Promise.allSettled(symbols.map(async symbol=>{
+    const snapshot=await fetchStockSnapshot(symbol);
+    return {symbol,snapshot};
+  }));
+  let successCount=0;
+  results.forEach((result,index)=>{
+    if(result.status==='fulfilled'){
+      const {symbol,snapshot}=result.value;
+      stockSnapshot[symbol]=snapshot;
+      successCount+=1;
+      return;
+    }
+    const symbol=symbols[index];
+    stockSnapshot[symbol]={yearHigh:NaN,currentPrice:NaN,growthRate:NaN};
+  });
+  renderStocks();
+  saveState();
+  if(successCount===symbols.length){
+    setStockPanelMeta(`已更新 ${successCount} 檔個股 ${formatPriceUpdateTime(new Date())}`,'var(--color-text-success)');
+  }else if(successCount>0){
+    setStockPanelMeta(`部分更新成功（${successCount}/${symbols.length}）`,'var(--color-text-danger)');
+  }else{
+    setStockPanelMeta('個股更新失敗，請稍後再試','var(--color-text-danger)');
+  }
 }
 
 async function refreshLatestPrices(){
@@ -279,7 +531,7 @@ function buildTargets(){
   el.innerHTML='';
   ETFs.forEach(etf=>{
     const card=document.createElement('div');
-    card.style.cssText='background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem';
+    card.className='target-card';
     card.innerHTML=`
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:1rem">
         <div style="font-size:15px;font-weight:500;color:var(--color-text-primary)">${etf.name}</div>
@@ -388,8 +640,22 @@ function calc(){
 
 restoreState();
 buildTargets();
+renderStocks();
 calc();
 refreshLatestPrices();
+
+document.getElementById('add_stock_btn').addEventListener('click',()=>{
+  const input=document.getElementById('stock_symbol_input');
+  addStock(input.value);
+  input.value='';
+});
+document.getElementById('stock_symbol_input').addEventListener('keydown',event=>{
+  if(event.key==='Enter'){
+    event.preventDefault();
+    document.getElementById('add_stock_btn').click();
+  }
+});
+refreshStocks();
 </script>
 </body>
 </html>
