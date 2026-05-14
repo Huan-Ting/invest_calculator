@@ -207,7 +207,7 @@
 <div class="panel">
   <div class="section-title">個股追蹤</div>
   <div class="stock-toolbar">
-    <input id="stock_symbol_input" type="text" placeholder="輸入股票代號，例如 AAPL" style="min-width:220px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 8px;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none">
+    <input id="stock_symbol_input" type="text" placeholder="輸入股票代號，例如 AAPL / MSFT / TSLA" style="min-width:220px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 8px;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none">
     <button id="add_stock_btn" type="button" style="font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 10px;background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer">新增個股</button>
     <div id="stock_panel_meta" style="font-size:11px;color:var(--color-text-secondary)">可自行新增喜歡的個股</div>
   </div>
@@ -247,6 +247,7 @@ const API_BASE_URL=window.__API_BASE_URL__||'';
 const FETCH_RETRY_COUNT=3;
 const STOCK_SYMBOL_PATTERN=/^[A-Za-z0-9.\-]{1,15}$/;
 const DEFAULT_STOCKS=['AAPL','MSFT','TSLA'];
+const ALLOWED_STOCK_SYMBOLS=new Set(['0050.TW','QQQ','VTI','VT','AAPL','MSFT','TSLA']);
 const likedStocks=[];
 const stockSnapshot={};
 const stockActual={};
@@ -438,6 +439,10 @@ function addStock(symbol){
   }
   if(!STOCK_SYMBOL_PATTERN.test(normalized)){
     setStockPanelMeta('代號格式錯誤','var(--color-text-danger)');
+    return;
+  }
+  if(!ALLOWED_STOCK_SYMBOLS.has(normalized)){
+    setStockPanelMeta('目前僅支援 0050.TW、QQQ、VTI、VT、AAPL、MSFT、TSLA','var(--color-text-danger)');
     return;
   }
   if(likedStocks.includes(normalized)){

@@ -11,6 +11,7 @@ const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 12 * 60 * 60 * 1000);
 const ALLOWED_SYMBOLS = new Set(['0050.TW', 'QQQ', 'VTI', 'VT']);
 const STOCK_CACHE_TTL_MS = Number(process.env.STOCK_CACHE_TTL_MS || 10 * 60 * 1000);
 const STOCK_SYMBOL_PATTERN = /^[A-Z0-9.\-]{1,15}$/;
+const ALLOWED_STOCK_SYMBOLS = new Set(['0050.TW', 'QQQ', 'VTI', 'VT', 'AAPL', 'MSFT', 'TSLA']);
 
 const athCache = new Map();
 const stockSnapshotCache = new Map();
@@ -119,20 +120,31 @@ function getOneYearHighFromYahooChart(data) {
   return high;
 }
 
-function getCurrentPriceFromYahooQuote(data) {
-  const result = data?.quoteResponse?.result?.[0];
-  const candidates = [
-    result?.regularMarketPrice,
-    result?.postMarketPrice,
-    result?.preMarketPrice,
+function getCurrentPriceFromYahooChart(data) {
+  const result = data?.chart?.result?.[0];
+  const meta = result?.meta;
+  const metaCandidates = [
+    meta?.regularMarketPrice,
+    meta?.previousClose,
+    meta?.chartPreviousClose,
   ];
-  for (const candidate of candidates) {
+  for (const candidate of metaCandidates) {
     const numberValue = Number(candidate);
     if (Number.isFinite(numberValue)) {
       return numberValue;
     }
   }
-  throw new Error('missing current price');
+
+  const closes = result?.indicators?.quote?.[0]?.close;
+  if (Array.isArray(closes)) {
+    for (let i = closes.length - 1; i >= 0; i -= 1) {
+      const numberValue = Number(closes[i]);
+      if (Number.isFinite(numberValue)) {
+        return numberValue;
+      }
+    }
+  }
+  throw new Error('missing current price from chart');
 }
 
 function isValidStockSymbol(symbol) {
@@ -145,13 +157,8 @@ async function fetchStockSnapshotFromYahoo(symbol) {
     `https://query1.finance.yahoo.com/v8/finance/chart/${encoded}?range=1y&interval=1d`,
     `https://query2.finance.yahoo.com/v8/finance/chart/${encoded}?range=1y&interval=1d`,
   ];
-  const quoteUrls = [
-    `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encoded}`,
-    `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${encoded}`,
-  ];
 
   let chartPayload = null;
-  let quotePayload = null;
   let lastError = null;
 
   for (const chartUrl of chartUrls) {
@@ -163,31 +170,19 @@ async function fetchStockSnapshotFromYahoo(symbol) {
     }
   }
 
-  for (const quoteUrl of quoteUrls) {
-    try {
-      quotePayload = await fetchJsonWithRetry(quoteUrl);
-      break;
-    } catch (error) {
-      lastError = error;
-    }
-  }
-
-  if (!chartPayload || !quotePayload) {
+  if (!chartPayload) {
     throw lastError || new Error('stock upstream unavailable');
   }
 
   const yearHigh = getOneYearHighFromYahooChart(chartPayload);
-  const currentPrice = getCurrentPriceFromYahooQuote(quotePayload);
+  const currentPrice = getCurrentPriceFromYahooChart(chartPayload);
   return {
     symbol,
     yearHigh,
     currentPrice,
-    source: 'yahoo-chart-1y-and-quote',
+    source: 'yahoo-chart-1y',
     asOf: new Date().toISOString(),
-    sourcePayloadHash: hashPayload({
-      chart: chartPayload,
-      quote: quotePayload,
-    }),
+    sourcePayloadHash: hashPayload(chartPayload),
   };
 }
 
@@ -257,7 +252,7 @@ app.get('/api/stock', async (req, res) => {
   const symbolRaw = typeof req.query.symbol === 'string' ? req.query.symbol : '';
   const symbol = symbolRaw.trim().toUpperCase();
 
-  if (!isValidStockSymbol(symbol)) {
+  if (!isValidStockSymbol(symbol) || !ALLOWED_STOCK_SYMBOLS.has(symbol)) {
     return sendError(res, 400, 'INVALID_SYMBOL', 'Unsupported symbol');
   }
 
