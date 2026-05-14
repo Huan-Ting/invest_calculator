@@ -246,8 +246,8 @@ const actual={};
 const API_BASE_URL=window.__API_BASE_URL__||'';
 const FETCH_RETRY_COUNT=3;
 const STOCK_SYMBOL_PATTERN=/^[A-Za-z0-9.\-]{1,15}$/;
-const DEFAULT_STOCKS=['AAPL','MSFT','TSLA'];
-const ALLOWED_STOCK_SYMBOLS=new Set(['0050.TW','QQQ','VTI','VT','AAPL','MSFT','TSLA']);
+const DEFAULT_STOCKS=['AAPL','MSFT','TSLA','NVDA','GOOG','PLTR','AMZN','META'];
+const ALLOWED_STOCK_SYMBOLS=new Set(['AAPL','MSFT','TSLA','NVDA','GOOG','PLTR','AMZN','META']);
 const likedStocks=[];
 const stockSnapshot={};
 const stockActual={};
@@ -442,7 +442,7 @@ function addStock(symbol){
     return;
   }
   if(!ALLOWED_STOCK_SYMBOLS.has(normalized)){
-    setStockPanelMeta('目前僅支援 0050.TW、QQQ、VTI、VT、AAPL、MSFT、TSLA','var(--color-text-danger)');
+    setStockPanelMeta('目前僅支援 AAPL、MSFT、TSLA、NVDA、GOOG、PLTR、AMZN、META','var(--color-text-danger)');
     return;
   }
   if(likedStocks.includes(normalized)){

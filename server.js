@@ -11,7 +11,7 @@ const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 12 * 60 * 60 * 1000);
 const ALLOWED_SYMBOLS = new Set(['0050.TW', 'QQQ', 'VTI', 'VT']);
 const STOCK_CACHE_TTL_MS = Number(process.env.STOCK_CACHE_TTL_MS || 10 * 60 * 1000);
 const STOCK_SYMBOL_PATTERN = /^[A-Z0-9.\-]{1,15}$/;
-const ALLOWED_STOCK_SYMBOLS = new Set(['0050.TW', 'QQQ', 'VTI', 'VT', 'AAPL', 'MSFT', 'TSLA']);
+const ALLOWED_STOCK_SYMBOLS = new Set(['AAPL', 'MSFT', 'TSLA', 'NVDA', 'GOOG', 'PLTR', 'AMZN', 'META']);
 
 const athCache = new Map();
 const stockSnapshotCache = new Map();
