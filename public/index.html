@@ -1,666 +1,1341 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>投資計劃試算器</title>
-<style>
-  :root {
-    --color-background-primary: #ffffff;
-    --color-background-secondary: #f5f5f4;
-    --color-text-primary: #1a1a1a;
-    --color-text-secondary: #6b6b6b;
-    --color-text-tertiary: #9b9b9b;
-    --color-text-success: #1a7f4b;
-    --color-text-danger: #c0392b;
-    --color-border-tertiary: rgba(0,0,0,0.12);
-    --color-border-secondary: rgba(0,0,0,0.22);
-    --border-radius-md: 8px;
-    --border-radius-lg: 12px;
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-background-primary: #1e1e1e;
-      --color-background-secondary: #2a2a2a;
-      --color-text-primary: #f0f0f0;
-      --color-text-secondary: #a0a0a0;
-      --color-text-tertiary: #6a6a6a;
-      --color-text-success: #4caf82;
-      --color-text-danger: #e57373;
-      --color-border-tertiary: rgba(255,255,255,0.12);
-      --color-border-secondary: rgba(255,255,255,0.22);
-    }
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: var(--font-sans);
-    background: var(--color-background-primary);
-    color: var(--color-text-primary);
-    padding: 1.5rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    font-size: 16px;
-    line-height: 1.5;
-  }
-  h1 { font-size: 18px; font-weight: 500; margin-bottom: 1.5rem; }
-  .layout {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-  .panel {
-    border: 0.5px solid var(--color-border-tertiary);
-    border-radius: var(--border-radius-lg);
-    padding: 1rem;
-  }
-  .section-title {
-    font-size: 13px;
-    color: var(--color-text-secondary);
-    margin-bottom: 12px;
-  }
-  .top-input-row {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-  }
-  .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-    margin-bottom: 1rem;
-  }
-  .summary-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 6px;
-  }
-  .summary-note {
-    font-size: 11px;
-    color: var(--color-text-tertiary);
-    text-align: right;
-    white-space: nowrap;
-  }
-  .targets-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-  }
-  .stock-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-  }
-  .target-card {
-    background: var(--color-background-primary);
-    border: 0.5px solid var(--color-border-tertiary);
-    border-radius: var(--border-radius-lg);
-    padding: 1.25rem;
-  }
-  @media (max-width: 1100px) {
-    .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .targets-grid { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 720px) {
-    .summary-grid { grid-template-columns: 1fr; }
-    .top-input-row { grid-template-columns: 1fr; }
-  }
-  input[type=number] { font-family: var(--font-sans); }
-  input[type=number]::-webkit-inner-spin-button,
-  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Investment Plan Calculator</title>
+    <style>
+      :root {
+        --color-background-primary: #ffffff;
+        --color-background-secondary: #f5f5f4;
+        --color-text-primary: #1a1a1a;
+        --color-text-secondary: #6b6b6b;
+        --color-text-tertiary: #9b9b9b;
+        --color-text-success: #1a7f4b;
+        --color-text-danger: #c0392b;
+        --color-text-status: #0b5d3b;
+        --color-border-tertiary: rgba(0, 0, 0, 0.12);
+        --color-border-secondary: rgba(0, 0, 0, 0.22);
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --color-background-primary: #1e1e1e;
+          --color-background-secondary: #2a2a2a;
+          --color-text-primary: #f0f0f0;
+          --color-text-secondary: #a0a0a0;
+          --color-text-tertiary: #6a6a6a;
+          --color-text-success: #4caf82;
+          --color-text-danger: #e57373;
+          --color-text-status: #3fae7b;
+          --color-border-tertiary: rgba(255, 255, 255, 0.12);
+          --color-border-secondary: rgba(255, 255, 255, 0.22);
+        }
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        padding: 1.5rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      h1 {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+      }
+      .layout {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+      .panel {
+        border: 0.5px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        padding: 1rem;
+      }
+      .section-title {
+        font-size: 13px;
+        color: var(--color-text-secondary);
+        margin-bottom: 12px;
+      }
+      .top-input-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+      }
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 1rem;
+      }
+      .summary-grid > :nth-child(4) {
+        grid-row: 2;
+        grid-column: 1;
+      }
+      .summary-grid > :nth-child(6) {
+        grid-row: 2;
+        grid-column: 2;
+      }
+      .summary-grid > :nth-child(5) {
+        grid-row: 2;
+        grid-column: 3;
+      }
+      .summary-grid > :nth-child(7) {
+        grid-row: 2;
+        grid-column: 4;
+      }
+      .summary-card-wide {
+        grid-column: span 2;
+      }
+      .summary-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .summary-note {
+        font-size: 11px;
+        color: var(--color-text-tertiary);
+        text-align: right;
+        white-space: nowrap;
+      }
+      .targets-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+      }
+      .stock-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .target-card {
+        background: var(--color-background-primary);
+        border: 0.5px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        padding: 1.25rem;
+      }
+      @media (max-width: 1100px) {
+        .summary-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .summary-card-wide {
+          grid-column: span 1;
+        }
+        .summary-grid > :nth-child(4),
+        .summary-grid > :nth-child(5),
+        .summary-grid > :nth-child(6),
+        .summary-grid > :nth-child(7) {
+          grid-row: auto;
+          grid-column: auto;
+        }
+        .targets-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 720px) {
+        .summary-grid {
+          grid-template-columns: 1fr;
+        }
+        .top-input-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      input[type="number"] {
+        font-family: var(--font-sans);
+      }
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Investment Plan Calculator</h1>
 
-<h1>投資計劃試算器</h1>
-
-<div class="layout">
-<div class="panel">
-  <div class="top-input-row">
-  <div>
-
-  <div class="section-title">目標配置</div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem">
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.875rem">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">目標台幣現金 (NT$)</div>
-      <input type="number" id="target_ntd" value="800000" style="width:100%;font-size:14px;font-weight:500;border:none;background:transparent;color:var(--color-text-primary);outline:none" oninput="calc()">
-    </div>
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.875rem">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">目標美金現金 (USD)</div>
-      <input type="number" id="target_usd" value="15000" style="width:100%;font-size:14px;font-weight:500;border:none;background:transparent;color:var(--color-text-primary);outline:none" oninput="calc()">
-    </div>
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.875rem">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">目標 ETF 佔比 (%)</div>
-      <input type="number" id="etf_pct" value="70" style="width:100%;font-size:14px;font-weight:500;border:none;background:transparent;color:var(--color-text-primary);outline:none" oninput="calc()">
-    </div>
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.875rem">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">目標個股佔比 (%)</div>
-      <input type="number" id="stk_pct" value="30" style="width:100%;font-size:14px;font-weight:500;border:none;background:transparent;color:var(--color-text-primary);outline:none" oninput="calc()">
-    </div>
-  </div>
-  </div>
-  <div>
-
-  <div class="section-title">最新月份現有現金（來自月度總覽）</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem">
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.875rem">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">現有台幣現金 (NT$)</div>
-      <input type="number" id="cur_ntd" value="0" style="width:100%;font-size:14px;font-weight:500;border:none;background:transparent;color:var(--color-text-primary);outline:none" oninput="calc()">
-    </div>
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.875rem">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">現有美金現金 (USD)</div>
-      <input type="number" id="cur_usd" value="0" style="width:100%;font-size:14px;font-weight:500;border:none;background:transparent;color:var(--color-text-primary);outline:none" oninput="calc()">
-    </div>
-  </div>
-  </div>
-  </div>
-</div>
-
-<div class="panel">
-  <div class="section-title">投資摘要與建議投入</div>
-  <div class="summary-grid">
-    <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
-      <div class="summary-head">
-        <div style="font-size:11px;color:var(--color-text-secondary)">需再投入台幣</div>
-        <div class="summary-note">（現有台幣現金 − 目標台幣現金）</div>
+    <div class="layout">
+      <div class="panel">
+        <div class="top-input-row">
+          <div>
+            <div class="section-title">Target Allocation</div>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 10px;
+                margin-bottom: 1.5rem;
+              "
+            >
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  border-radius: var(--border-radius-md);
+                  padding: 0.875rem;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--color-text-secondary);
+                    margin-bottom: 5px;
+                  "
+                >
+                  Target TWD
+                </div>
+                <input
+                  type="number"
+                  id="target_ntd"
+                  value="800000"
+                  style="
+                    width: 100%;
+                    font-size: 14px;
+                    font-weight: 500;
+                    border: none;
+                    background: transparent;
+                    color: var(--color-text-primary);
+                    outline: none;
+                  "
+                  oninput="calc()"
+                />
+              </div>
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  border-radius: var(--border-radius-md);
+                  padding: 0.875rem;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--color-text-secondary);
+                    margin-bottom: 5px;
+                  "
+                >
+                  Target USD
+                </div>
+                <input
+                  type="number"
+                  id="target_usd"
+                  value="15000"
+                  style="
+                    width: 100%;
+                    font-size: 14px;
+                    font-weight: 500;
+                    border: none;
+                    background: transparent;
+                    color: var(--color-text-primary);
+                    outline: none;
+                  "
+                  oninput="calc()"
+                />
+              </div>
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  border-radius: var(--border-radius-md);
+                  padding: 0.875rem;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--color-text-secondary);
+                    margin-bottom: 5px;
+                  "
+                >
+                  Target ETF(%)
+                </div>
+                <input
+                  type="number"
+                  id="etf_pct"
+                  value="70"
+                  style="
+                    width: 100%;
+                    font-size: 14px;
+                    font-weight: 500;
+                    border: none;
+                    background: transparent;
+                    color: var(--color-text-primary);
+                    outline: none;
+                  "
+                  oninput="calc()"
+                />
+              </div>
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  border-radius: var(--border-radius-md);
+                  padding: 0.875rem;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--color-text-secondary);
+                    margin-bottom: 5px;
+                  "
+                >
+                  Target indvd Stock(%)
+                </div>
+                <input
+                  type="number"
+                  id="stk_pct"
+                  value="30"
+                  style="
+                    width: 100%;
+                    font-size: 14px;
+                    font-weight: 500;
+                    border: none;
+                    background: transparent;
+                    color: var(--color-text-primary);
+                    outline: none;
+                  "
+                  oninput="calc()"
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="section-title">
+              Current Cash in Latest Month (from monthly overview)
+            </div>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 1.5rem;
+              "
+            >
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  border-radius: var(--border-radius-md);
+                  padding: 0.875rem;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--color-text-secondary);
+                    margin-bottom: 5px;
+                  "
+                >
+                  Current TWD
+                </div>
+                <input
+                  type="number"
+                  id="cur_ntd"
+                  value="0"
+                  style="
+                    width: 100%;
+                    font-size: 14px;
+                    font-weight: 500;
+                    border: none;
+                    background: transparent;
+                    color: var(--color-text-primary);
+                    outline: none;
+                  "
+                  oninput="calc()"
+                />
+              </div>
+              <div
+                style="
+                  background: var(--color-background-secondary);
+                  border-radius: var(--border-radius-md);
+                  padding: 0.875rem;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    color: var(--color-text-secondary);
+                    margin-bottom: 5px;
+                  "
+                >
+                  Current USD
+                </div>
+                <input
+                  type="number"
+                  id="cur_usd"
+                  value="0"
+                  style="
+                    width: 100%;
+                    font-size: 14px;
+                    font-weight: 500;
+                    border: none;
+                    background: transparent;
+                    color: var(--color-text-primary);
+                    outline: none;
+                  "
+                  oninput="calc()"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="need_ntd_display" style="font-size:20px;font-weight:500">—</div>
-    </div>
-    <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
-      <div class="summary-head">
-        <div style="font-size:11px;color:var(--color-text-secondary)">需再投入美金</div>
-        <div class="summary-note">（現有美金現金 − 目標美金現金）</div>
+
+      <div class="panel">
+        <div class="section-title">
+          Investment Summary and Suggested Allocation
+        </div>
+        <div class="summary-grid">
+          <div
+            style="
+              border-radius: var(--border-radius-md);
+              padding: 1rem;
+              border: 0.5px solid var(--color-border-tertiary);
+            "
+          >
+            <div class="summary-head">
+              <div style="font-size: 11px; color: var(--color-text-secondary)">
+                Additional TWD to Invest
+              </div>
+              <div class="summary-note">(Current TWD − Target TWD)</div>
+            </div>
+            <div
+              id="need_ntd_display"
+              style="font-size: 20px; font-weight: 500"
+            >
+              —
+            </div>
+          </div>
+          <div
+            style="
+              border-radius: var(--border-radius-md);
+              padding: 1rem;
+              border: 0.5px solid var(--color-border-tertiary);
+            "
+          >
+            <div class="summary-head">
+              <div style="font-size: 11px; color: var(--color-text-secondary)">
+                Additional USD to Invest
+              </div>
+              <div class="summary-note">(Current USD − Target USD)</div>
+            </div>
+            <div
+              id="need_usd_display"
+              style="font-size: 20px; font-weight: 500"
+            >
+              —
+            </div>
+          </div>
+          <div
+            class="summary-card-wide"
+            style="
+              border-radius: var(--border-radius-md);
+              padding: 1rem;
+              border: 0.5px solid var(--color-border-tertiary);
+            "
+          >
+            <div class="summary-head">
+              <div style="font-size: 11px; color: var(--color-text-secondary)">
+                Additional ETF USD to Invest
+              </div>
+              <div class="summary-note">
+                (Additional USD to Invest × Target ETF%)
+              </div>
+            </div>
+            <div
+              id="need_etf_usd_display"
+              style="font-size: 20px; font-weight: 500"
+            >
+              —
+            </div>
+          </div>
+          <div
+            style="
+              border-radius: var(--border-radius-md);
+              padding: 1rem;
+              border: 0.5px solid var(--color-border-tertiary);
+            "
+          >
+            <div class="summary-head">
+              <div style="font-size: 11px; color: var(--color-text-secondary)">
+                Current Investment(NT$)
+              </div>
+              <div class="summary-note"></div>
+            </div>
+            <div
+              id="current_invest_display"
+              style="font-size: 20px; font-weight: 500"
+            >
+              —
+            </div>
+          </div>
+          <div
+            style="
+              border-radius: var(--border-radius-md);
+              padding: 1rem;
+              border: 0.5px solid var(--color-border-tertiary);
+            "
+          >
+            <div class="summary-head">
+              <div style="font-size: 11px; color: var(--color-text-secondary)">
+                Current Investment (US$)
+              </div>
+              <div class="summary-note"></div>
+            </div>
+            <div
+              id="current_invest_usd_display"
+              style="font-size: 20px; font-weight: 500"
+            >
+              —
+            </div>
+          </div>
+          <div
+            style="
+              border-radius: var(--border-radius-md);
+              padding: 1rem;
+              border: 0.5px solid var(--color-border-tertiary);
+            "
+          >
+            <div class="summary-head">
+              <div style="font-size: 11px; color: var(--color-text-secondary)">
+                Remaining Amount(NT$)
+              </div>
+              <div class="summary-note"></div>
+            </div>
+            <div
+              id="remaining_display"
+              style="font-size: 20px; font-weight: 500"
+            >
+              —
+            </div>
+          </div>
+          <div
+            style="
+              border-radius: var(--border-radius-md);
+              padding: 1rem;
+              border: 0.5px solid var(--color-border-tertiary);
+            "
+          >
+            <div class="summary-head">
+              <div style="font-size: 11px; color: var(--color-text-secondary)">
+                Remaining Amount(US$)
+              </div>
+              <div class="summary-note"></div>
+            </div>
+            <div
+              id="remaining_usd_display"
+              style="font-size: 20px; font-weight: 500"
+            >
+              —
+            </div>
+          </div>
+        </div>
+
+        <div id="targets" class="targets-grid"></div>
       </div>
-      <div id="need_usd_display" style="font-size:20px;font-weight:500">—</div>
-    </div>
-    <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
-      <div class="summary-head">
-        <div style="font-size:11px;color:var(--color-text-secondary)">需再投入ETF美金</div>
-        <div class="summary-note">（需再投入美金 × 目標 ETF 佔比）</div>
+
+      <div class="panel">
+        <div class="section-title">Stock Tracking</div>
+        <div class="stock-toolbar">
+          <input
+            id="stock_symbol_input"
+            type="text"
+            placeholder="Enter stock symbol, e.g. AAPL / MSFT / TSLA"
+            style="
+              min-width: 220px;
+              font-size: 13px;
+              border: 0.5px solid var(--color-border-secondary);
+              border-radius: var(--border-radius-md);
+              padding: 6px 8px;
+              background: var(--color-background-secondary);
+              color: var(--color-text-primary);
+              outline: none;
+            "
+          />
+          <button
+            id="add_stock_btn"
+            type="button"
+            style="
+              font-size: 13px;
+              border: 0.5px solid var(--color-border-secondary);
+              border-radius: var(--border-radius-md);
+              padding: 6px 10px;
+              background: var(--color-background-primary);
+              color: var(--color-text-primary);
+              cursor: pointer;
+            "
+          >
+            Add Stock
+          </button>
+          <div
+            id="stock_panel_meta"
+            style="font-size: 11px; color: var(--color-text-secondary)"
+          >
+            <span style="color: var(--color-text-secondary)">●</span>
+            You can add stocks you like
+          </div>
+        </div>
+        <div style="overflow-x: auto">
+          <table
+            style="
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 13px;
+              table-layout: fixed;
+            "
+          >
+            <colgroup>
+              <col style="width: 120px" />
+              <col style="width: 160px" />
+              <col style="width: 140px" />
+              <col style="width: 120px" />
+              <col style="width: 160px" />
+              <col style="width: 90px" />
+            </colgroup>
+            <thead>
+              <tr
+                style="border-bottom: 0.5px solid var(--color-border-tertiary)"
+              >
+                <th
+                  style="
+                    text-align: left;
+                    padding: 7px 4px;
+                    color: var(--color-text-secondary);
+                    font-weight: 400;
+                    font-size: 12px;
+                  "
+                >
+                  Stock
+                </th>
+                <th
+                  style="
+                    text-align: left;
+                    padding: 7px 4px;
+                    color: var(--color-text-secondary);
+                    font-weight: 400;
+                    font-size: 12px;
+                  "
+                >
+                  1Y High
+                </th>
+                <th
+                  style="
+                    text-align: left;
+                    padding: 7px 4px;
+                    color: var(--color-text-secondary);
+                    font-weight: 400;
+                    font-size: 12px;
+                  "
+                >
+                  Current Price
+                </th>
+                <th
+                  style="
+                    text-align: left;
+                    padding: 7px 4px;
+                    color: var(--color-text-secondary);
+                    font-weight: 400;
+                    font-size: 12px;
+                  "
+                >
+                  Growth Rate
+                </th>
+                <th
+                  style="
+                    text-align: left;
+                    padding: 7px 4px;
+                    color: var(--color-text-secondary);
+                    font-weight: 400;
+                    font-size: 12px;
+                  "
+                >
+                  Actual Investment
+                </th>
+                <th
+                  style="
+                    text-align: left;
+                    padding: 7px 4px;
+                    color: var(--color-text-secondary);
+                    font-weight: 400;
+                    font-size: 12px;
+                  "
+                >
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody id="stock_rows"></tbody>
+          </table>
+        </div>
+        <div
+          style="
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+          "
+        >
+          Current Investment:
+          <span
+            id="stock_current_invest_display"
+            style="font-weight: 500; color: var(--color-text-primary)"
+            >0</span
+          >
+        </div>
       </div>
-      <div id="need_etf_usd_display" style="font-size:20px;font-weight:500">—</div>
     </div>
-    <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary)">
-      <div class="summary-head">
-        <div style="font-size:11px;color:var(--color-text-secondary)">目前投入</div>
-        <div class="summary-note">（四個標的實際投入加總）</div>
-      </div>
-      <div id="current_invest_display" style="font-size:20px;font-weight:500">—</div>
-    </div>
-    <div style="border-radius:var(--border-radius-md);padding:1rem;border:0.5px solid var(--color-border-tertiary);grid-column:span 2">
-      <div class="summary-head">
-        <div style="font-size:11px;color:var(--color-text-secondary)">目前剩餘</div>
-        <div class="summary-note">（需再投入台幣 − 目前投入）</div>
-      </div>
-      <div id="remaining_display" style="font-size:20px;font-weight:500">—</div>
-    </div>
-  </div>
 
-  <div id="targets" class="targets-grid"></div>
-</div>
+    <script>
+      const ETFs = [
+        {
+          id: "tw50",
+          name: "Taiwan50",
+          currency: "NT$",
+          divs: 5,
+          ranges: [
+            [5, 7],
+            [7, 10],
+            [10, 20],
+            [20, 30],
+          ],
+          needKey: "ntd",
+          quoteSymbol: "0050.TW",
+        },
+        {
+          id: "qqq",
+          name: "QQQ",
+          currency: "USD",
+          divs: 12,
+          ranges: [
+            [7, 10],
+            [10, 13],
+            [13, 20],
+          ],
+          needKey: "usd",
+          quoteSymbol: "QQQ",
+        },
+        {
+          id: "vti",
+          name: "VTI",
+          currency: "USD",
+          divs: 12,
+          ranges: [
+            [7, 10],
+            [10, 13],
+            [13, 20],
+          ],
+          needKey: "usd",
+          quoteSymbol: "VTI",
+        },
+        {
+          id: "vt",
+          name: "VT",
+          currency: "USD",
+          divs: 12,
+          ranges: [
+            [7, 10],
+            [10, 13],
+            [13, 20],
+          ],
+          needKey: "usd",
+          quoteSymbol: "VT",
+        },
+      ];
 
-<div class="panel">
-  <div class="section-title">個股追蹤</div>
-  <div class="stock-toolbar">
-    <input id="stock_symbol_input" type="text" placeholder="輸入股票代號，例如 AAPL / MSFT / TSLA" style="min-width:220px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 8px;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none">
-    <button id="add_stock_btn" type="button" style="font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 10px;background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer">新增個股</button>
-    <div id="stock_panel_meta" style="font-size:11px;color:var(--color-text-secondary)">可自行新增喜歡的個股</div>
-  </div>
-  <div style="overflow-x:auto">
-    <table style="width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed">
-      <colgroup><col style="width:120px"><col style="width:160px"><col style="width:140px"><col style="width:120px"><col style="width:160px"><col style="width:90px"></colgroup>
-      <thead>
-        <tr style="border-bottom:0.5px solid var(--color-border-tertiary)">
-          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">個股</th>
-          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">一年內最高價</th>
-          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">目前價格</th>
-          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">成長率</th>
-          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">實際投入</th>
-          <th style="text-align:left;padding:7px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">操作</th>
-        </tr>
-      </thead>
-      <tbody id="stock_rows"></tbody>
-    </table>
-  </div>
-  <div style="margin-top:10px;font-size:13px;color:var(--color-text-secondary)">目前投入：<span id="stock_current_invest_display" style="font-weight:500;color:var(--color-text-primary)">0</span></div>
-</div>
-</div>
+      const STORAGE_KEY = "inv_plan_v3";
+      const DEFAULTS = {
+        target_ntd: 800000,
+        target_usd: 15000,
+        etf_pct: 70,
+        stk_pct: 30,
+        cur_ntd: 0,
+        cur_usd: 0,
+      };
+      const prices = { tw50: 81, qqq: 635, vti: 343, vt: 148.9 };
+      const actual = {};
+      const API_BASE_URL = window.__API_BASE_URL__ || "";
+      const FETCH_RETRY_COUNT = 3;
+      const STOCK_SYMBOL_PATTERN = /^[A-Za-z0-9.\-]{1,15}$/;
+      const DEFAULT_STOCKS = [
+        "AAPL",
+        "MSFT",
+        "TSLA",
+        "NVDA",
+        "GOOG",
+        "PLTR",
+        "AMZN",
+        "META",
+      ];
+      const ALLOWED_STOCK_SYMBOLS = new Set([
+        "AAPL",
+        "MSFT",
+        "TSLA",
+        "NVDA",
+        "GOOG",
+        "PLTR",
+        "AMZN",
+        "META",
+      ]);
+      const likedStocks = [];
+      const stockSnapshot = {};
+      const stockActual = {};
 
-<script>
-const ETFs=[
-  {id:'tw50',name:'Taiwan50',currency:'NT$',divs:5,ranges:[[5,7],[7,10],[10,20],[20,30]],needKey:'ntd',quoteSymbol:'0050.TW'},
-  {id:'qqq',name:'QQQ',currency:'USD',divs:12,ranges:[[7,10],[10,13],[13,20]],needKey:'usd',quoteSymbol:'QQQ'},
-  {id:'vti',name:'VTI',currency:'USD',divs:12,ranges:[[7,10],[10,13],[13,20]],needKey:'usd',quoteSymbol:'VTI'},
-  {id:'vt',name:'VT',currency:'USD',divs:12,ranges:[[7,10],[10,13],[13,20]],needKey:'usd',quoteSymbol:'VT'},
-];
+      function withTimeout(promise, ms = 8000) {
+        return new Promise((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error("timeout")), ms);
+          promise.then(
+            (value) => {
+              clearTimeout(timer);
+              resolve(value);
+            },
+            (err) => {
+              clearTimeout(timer);
+              reject(err);
+            },
+          );
+        });
+      }
 
-const STORAGE_KEY='inv_plan_v3';
-const DEFAULTS={target_ntd:800000,target_usd:15000,etf_pct:70,stk_pct:30,cur_ntd:0,cur_usd:0};
-const prices={tw50:81,qqq:635,vti:343,vt:148.9};
-const actual={};
-const API_BASE_URL=window.__API_BASE_URL__||'';
-const FETCH_RETRY_COUNT=3;
-const STOCK_SYMBOL_PATTERN=/^[A-Za-z0-9.\-]{1,15}$/;
-const DEFAULT_STOCKS=['AAPL','MSFT','TSLA','NVDA','GOOG','PLTR','AMZN','META'];
-const ALLOWED_STOCK_SYMBOLS=new Set(['AAPL','MSFT','TSLA','NVDA','GOOG','PLTR','AMZN','META']);
-const likedStocks=[];
-const stockSnapshot={};
-const stockActual={};
+      function loadState() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        } catch (e) {
+          return {};
+        }
+      }
+      function saveState() {
+        const state = {
+          target_ntd: document.getElementById("target_ntd").value,
+          target_usd: document.getElementById("target_usd").value,
+          etf_pct: document.getElementById("etf_pct").value,
+          stk_pct: document.getElementById("stk_pct").value,
+          cur_ntd: document.getElementById("cur_ntd").value,
+          cur_usd: document.getElementById("cur_usd").value,
+          prices: { ...prices },
+          actual: { ...actual },
+          likedStocks: [...likedStocks],
+          stockSnapshot: { ...stockSnapshot },
+          stockActual: { ...stockActual },
+        };
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {}
+      }
+      function restoreState() {
+        const s = loadState();
+        [
+          "target_ntd",
+          "target_usd",
+          "etf_pct",
+          "stk_pct",
+          "cur_ntd",
+          "cur_usd",
+        ].forEach((id) => {
+          const el = document.getElementById(id);
+          if (s[id] !== undefined) el.value = s[id];
+          else el.value = DEFAULTS[id];
+        });
+        if (s.prices) Object.assign(prices, s.prices);
+        if (s.actual) Object.assign(actual, s.actual);
+        const restoredStocks =
+          Array.isArray(s.likedStocks) && s.likedStocks.length
+            ? s.likedStocks
+            : DEFAULT_STOCKS;
+        restoredStocks.forEach((symbol) => {
+          const normalized = String(symbol || "")
+            .trim()
+            .toUpperCase();
+          if (
+            normalized &&
+            STOCK_SYMBOL_PATTERN.test(normalized) &&
+            !likedStocks.includes(normalized)
+          ) {
+            likedStocks.push(normalized);
+          }
+        });
+        if (s.stockSnapshot && typeof s.stockSnapshot === "object")
+          Object.assign(stockSnapshot, s.stockSnapshot);
+        if (s.stockActual && typeof s.stockActual === "object")
+          Object.assign(stockActual, s.stockActual);
+      }
 
-function withTimeout(promise,ms=8000){
-  return new Promise((resolve,reject)=>{
-    const timer=setTimeout(()=>reject(new Error('timeout')),ms);
-    promise.then(
-      value=>{ clearTimeout(timer); resolve(value); },
-      err=>{ clearTimeout(timer); reject(err); }
-    );
-  });
-}
+      function fmt(n, curr) {
+        if (n === null || n === undefined || isNaN(n)) return "—";
+        if (curr === "NT$") return "NT$" + Math.round(n).toLocaleString();
+        return "$" + Number(n).toFixed(2);
+      }
+      function fmtBig(n, curr) {
+        if (n === null || n === undefined || isNaN(n)) return "—";
+        if (curr === "NT$") return "NT$" + Math.round(n).toLocaleString();
+        return "$" + Math.round(n).toLocaleString();
+      }
+      function colorVal(n) {
+        if (n > 0) return "var(--color-text-success)";
+        if (n < 0) return "var(--color-text-danger)";
+        return "var(--color-text-primary)";
+      }
 
-function loadState(){
-  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY))||{}; }
-  catch(e){ return {}; }
-}
-function saveState(){
-  const state={
-    target_ntd:document.getElementById('target_ntd').value,
-    target_usd:document.getElementById('target_usd').value,
-    etf_pct:document.getElementById('etf_pct').value,
-    stk_pct:document.getElementById('stk_pct').value,
-    cur_ntd:document.getElementById('cur_ntd').value,
-    cur_usd:document.getElementById('cur_usd').value,
-    prices:{...prices},
-    actual:{...actual},
-    likedStocks:[...likedStocks],
-    stockSnapshot:{...stockSnapshot},
-    stockActual:{...stockActual},
-  };
-  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }
-  catch(e){}
-}
-function restoreState(){
-  const s=loadState();
-  ['target_ntd','target_usd','etf_pct','stk_pct','cur_ntd','cur_usd'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(s[id]!==undefined) el.value=s[id];
-    else el.value=DEFAULTS[id];
-  });
-  if(s.prices) Object.assign(prices,s.prices);
-  if(s.actual) Object.assign(actual,s.actual);
-  const restoredStocks=Array.isArray(s.likedStocks)&&s.likedStocks.length?s.likedStocks:DEFAULT_STOCKS;
-  restoredStocks.forEach(symbol=>{
-    const normalized=String(symbol||'').trim().toUpperCase();
-    if(normalized&&STOCK_SYMBOL_PATTERN.test(normalized)&&!likedStocks.includes(normalized)){
-      likedStocks.push(normalized);
-    }
-  });
-  if(s.stockSnapshot&&typeof s.stockSnapshot==='object') Object.assign(stockSnapshot,s.stockSnapshot);
-  if(s.stockActual&&typeof s.stockActual==='object') Object.assign(stockActual,s.stockActual);
-}
+      function setPriceMeta(etfId, text, color = "var(--color-text-status)") {
+        const el = document.getElementById("price_meta_" + etfId);
+        if (!el) return;
+        let iconColor = "var(--color-text-secondary)";
+        if (color === "success") iconColor = "var(--color-text-success)";
+        if (color === "fail") iconColor = "var(--color-text-danger)";
+        el.innerHTML = `<span style="color:${iconColor}">●</span> ${text}`;
+        el.style.color = "var(--color-text-secondary)";
+      }
 
-function fmt(n,curr){
-  if(n===null||n===undefined||isNaN(n))return'—';
-  if(curr==='NT$')return'NT$'+Math.round(n).toLocaleString();
-  return'$'+Number(n).toFixed(2);
-}
-function fmtBig(n,curr){
-  if(n===null||n===undefined||isNaN(n))return'—';
-  if(curr==='NT$')return'NT$'+Math.round(n).toLocaleString();
-  return'$'+Math.round(n).toLocaleString();
-}
-function colorVal(n){
-  if(n>0)return'var(--color-text-success)';
-  if(n<0)return'var(--color-text-danger)';
-  return'var(--color-text-primary)';
-}
+      function syncPriceInput(etfId) {
+        const input = document.getElementById("p_" + etfId);
+        if (input) input.value = prices[etfId];
+      }
 
-function setPriceMeta(etfId,text,color='var(--color-text-secondary)'){
-  const el=document.getElementById('price_meta_'+etfId);
-  if(!el)return;
-  el.textContent=text;
-  el.style.color=color;
-}
+      async function fetchJson(url) {
+        const res = await withTimeout(fetch(url, { cache: "no-store" }));
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      }
 
-function syncPriceInput(etfId){
-  const input=document.getElementById('p_'+etfId);
-  if(input) input.value=prices[etfId];
-}
+      async function fetchJsonWithRetry(url, retries = FETCH_RETRY_COUNT) {
+        let lastError = null;
+        for (let attempt = 0; attempt < retries; attempt++) {
+          try {
+            return await fetchJson(url);
+          } catch (err) {
+            lastError = err;
+          }
+        }
+        throw lastError || new Error("request failed");
+      }
 
-async function fetchJson(url){
-  const res=await withTimeout(fetch(url,{cache:'no-store'}));
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
+      async function fetchAllTimeHighPrice(symbol) {
+        const endpoint = `${API_BASE_URL}/api/ath?symbol=${encodeURIComponent(symbol)}`;
+        const data = await fetchJsonWithRetry(endpoint);
+        const ath = Number(data?.ath);
+        if (!Number.isFinite(ath)) throw new Error("invalid ath response");
+        return ath;
+      }
 
-async function fetchJsonWithRetry(url,retries=FETCH_RETRY_COUNT){
-  let lastError=null;
-  for(let attempt=0;attempt<retries;attempt++){
-    try{
-      return await fetchJson(url);
-    }catch(err){
-      lastError=err;
-    }
-  }
-  throw lastError||new Error('request failed');
-}
+      async function fetchLatestPrice(etf) {
+        return fetchAllTimeHighPrice(etf.quoteSymbol);
+      }
 
-async function fetchAllTimeHighPrice(symbol){
-  const endpoint=`${API_BASE_URL}/api/ath?symbol=${encodeURIComponent(symbol)}`;
-  const data=await fetchJsonWithRetry(endpoint);
-  const ath=Number(data?.ath);
-  if(!Number.isFinite(ath)) throw new Error('invalid ath response');
-  return ath;
-}
+      function formatPriceUpdateTime(date) {
+        return new Intl.DateTimeFormat("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }).format(date);
+      }
+      function formatStockNumber(value) {
+        if (!Number.isFinite(value)) return "—";
+        return value.toFixed(2);
+      }
+      function formatStockGrowth(value) {
+        if (!Number.isFinite(value)) return "—";
+        const sign = value > 0 ? "+" : "";
+        return `${sign}${value.toFixed(2)}%`;
+      }
 
-async function fetchLatestPrice(etf){
-  return fetchAllTimeHighPrice(etf.quoteSymbol);
-}
+      function roundPriceForDisplay(price, currency) {
+        return currency === "NT$"
+          ? Math.round(price)
+          : Number(price.toFixed(2));
+      }
 
-function formatPriceUpdateTime(date){
-  return new Intl.DateTimeFormat('zh-TW',{
-    hour:'2-digit',
-    minute:'2-digit',
-    second:'2-digit',
-  }).format(date);
-}
-function formatStockNumber(value){
-  if(!Number.isFinite(value)) return '—';
-  return value.toFixed(2);
-}
-function formatStockGrowth(value){
-  if(!Number.isFinite(value)) return '—';
-  const sign=value>0?'+':'';
-  return `${sign}${value.toFixed(2)}%`;
-}
+      function setStockPanelMeta(text, color = "var(--color-text-status)") {
+        const el = document.getElementById("stock_panel_meta");
+        if (!el) return;
+        let iconColor = "var(--color-text-secondary)";
+        if (color === "success") iconColor = "var(--color-text-success)";
+        if (color === "fail") iconColor = "var(--color-text-danger)";
+        el.innerHTML = `<span style="color:${iconColor}">●</span> ${text}`;
+        el.style.color = "var(--color-text-secondary)";
+      }
 
-function roundPriceForDisplay(price,currency){
-  return currency==='NT$'?Math.round(price):Number(price.toFixed(2));
-}
+      async function fetchStockSnapshot(symbol) {
+        const endpoint = `${API_BASE_URL}/api/stock?symbol=${encodeURIComponent(symbol)}`;
+        const data = await fetchJsonWithRetry(endpoint);
+        const yearHigh = Number(data?.yearHigh);
+        const currentPrice = Number(data?.currentPrice);
+        const growthRate = Number(data?.growthRate);
+        if (
+          !Number.isFinite(yearHigh) ||
+          !Number.isFinite(currentPrice) ||
+          !Number.isFinite(growthRate)
+        ) {
+          throw new Error("invalid stock snapshot");
+        }
+        return { yearHigh, currentPrice, growthRate };
+      }
 
-function setStockPanelMeta(text,color='var(--color-text-secondary)'){
-  const el=document.getElementById('stock_panel_meta');
-  if(!el) return;
-  el.textContent=text;
-  el.style.color=color;
-}
-
-async function fetchStockSnapshot(symbol){
-  const endpoint=`${API_BASE_URL}/api/stock?symbol=${encodeURIComponent(symbol)}`;
-  const data=await fetchJsonWithRetry(endpoint);
-  const yearHigh=Number(data?.yearHigh);
-  const currentPrice=Number(data?.currentPrice);
-  const growthRate=Number(data?.growthRate);
-  if(!Number.isFinite(yearHigh)||!Number.isFinite(currentPrice)||!Number.isFinite(growthRate)){
-    throw new Error('invalid stock snapshot');
-  }
-  return {yearHigh,currentPrice,growthRate};
-}
-
-function renderStocks(){
-  const tbody=document.getElementById('stock_rows');
-  tbody.innerHTML='';
-  likedStocks.forEach(symbol=>{
-    const row=document.createElement('tr');
-    row.style.borderBottom='0.5px solid var(--color-border-tertiary)';
-    const snapshot=stockSnapshot[symbol]||{};
-    const growthRate=Number(snapshot.growthRate);
-    row.innerHTML=`
+      function renderStocks() {
+        const tbody = document.getElementById("stock_rows");
+        tbody.innerHTML = "";
+        likedStocks.forEach((symbol) => {
+          const row = document.createElement("tr");
+          row.style.borderBottom = "0.5px solid var(--color-border-tertiary)";
+          const snapshot = stockSnapshot[symbol] || {};
+          const growthRate = Number(snapshot.growthRate);
+          row.innerHTML = `
       <td style="padding:8px 4px;font-weight:500;color:var(--color-text-primary)">${symbol}</td>
       <td style="padding:8px 4px;color:var(--color-text-primary)">${formatStockNumber(Number(snapshot.yearHigh))}</td>
       <td style="padding:8px 4px;color:var(--color-text-primary)">${formatStockNumber(Number(snapshot.currentPrice))}</td>
       <td style="padding:8px 4px;color:${colorVal(growthRate)}">${formatStockGrowth(growthRate)}</td>
-      <td style="padding:8px 4px"><input type="number" placeholder="0" value="${stockActual[symbol]??''}" style="width:100%;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 6px;background:var(--color-background-secondary);color:var(--color-text-primary)" oninput="stockActual['${symbol}']=this.value;updateStockCurrentInvestDisplay();saveState()"></td>
-      <td style="padding:8px 4px"><button type="button" style="font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 8px;background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer" onclick="removeStock('${symbol}')">移除</button></td>
+      <td style="padding:8px 4px"><input type="number" placeholder="0" value="${stockActual[symbol] ?? ""}" style="width:100%;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 6px;background:var(--color-background-secondary);color:var(--color-text-primary)" oninput="stockActual['${symbol}']=this.value;updateStockCurrentInvestDisplay();calc();saveState()"></td>
+      <td style="padding:8px 4px"><button type="button" style="font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 8px;background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer" onclick="removeStock('${symbol}')">Remove</button></td>
     `;
-    tbody.appendChild(row);
-  });
-  updateStockCurrentInvestDisplay();
-}
+          tbody.appendChild(row);
+        });
+        updateStockCurrentInvestDisplay();
+      }
 
-function updateStockCurrentInvestDisplay(){
-  let total=0;
-  likedStocks.forEach(symbol=>{
-    const value=parseFloat(stockActual[symbol]);
-    if(Number.isFinite(value)) total+=value;
-  });
-  document.getElementById('stock_current_invest_display').textContent=total.toLocaleString();
-}
+      function updateStockCurrentInvestDisplay() {
+        let total = 0;
+        likedStocks.forEach((symbol) => {
+          const value = parseFloat(stockActual[symbol]);
+          if (Number.isFinite(value)) total += value;
+        });
+        document.getElementById("stock_current_invest_display").textContent =
+          total.toLocaleString();
+      }
 
-function addStock(symbol){
-  const normalized=String(symbol||'').trim().toUpperCase();
-  if(!normalized){
-    setStockPanelMeta('請輸入個股代號','var(--color-text-danger)');
-    return;
-  }
-  if(!STOCK_SYMBOL_PATTERN.test(normalized)){
-    setStockPanelMeta('代號格式錯誤','var(--color-text-danger)');
-    return;
-  }
-  if(!ALLOWED_STOCK_SYMBOLS.has(normalized)){
-    setStockPanelMeta('目前僅支援 AAPL、MSFT、TSLA、NVDA、GOOG、PLTR、AMZN、META','var(--color-text-danger)');
-    return;
-  }
-  if(likedStocks.includes(normalized)){
-    setStockPanelMeta(`${normalized} 已存在`,'var(--color-text-danger)');
-    return;
-  }
-  likedStocks.push(normalized);
-  renderStocks();
-  refreshStocks([normalized]);
-  saveState();
-}
+      function addStock(symbol) {
+        const normalized = String(symbol || "")
+          .trim()
+          .toUpperCase();
+        if (!normalized) {
+          setStockPanelMeta(
+            "Please enter a stock symbol",
+            "fail",
+          );
+          return;
+        }
+        if (!STOCK_SYMBOL_PATTERN.test(normalized)) {
+          setStockPanelMeta(
+            "Invalid symbol format",
+            "fail",
+          );
+          return;
+        }
+        if (!ALLOWED_STOCK_SYMBOLS.has(normalized)) {
+          setStockPanelMeta(
+            "Currently only supports AAPL, MSFT, TSLA, NVDA, GOOG, PLTR, AMZN, META",
+            "fail",
+          );
+          return;
+        }
+        if (likedStocks.includes(normalized)) {
+          setStockPanelMeta(
+            `${normalized} already exists`,
+            "fail",
+          );
+          return;
+        }
+        likedStocks.push(normalized);
+        renderStocks();
+        refreshStocks([normalized]);
+        saveState();
+      }
 
-function removeStock(symbol){
-  const index=likedStocks.indexOf(symbol);
-  if(index===-1) return;
-  likedStocks.splice(index,1);
-  delete stockSnapshot[symbol];
-  delete stockActual[symbol];
-  renderStocks();
-  saveState();
-}
+      function removeStock(symbol) {
+        const index = likedStocks.indexOf(symbol);
+        if (index === -1) return;
+        likedStocks.splice(index, 1);
+        delete stockSnapshot[symbol];
+        delete stockActual[symbol];
+        renderStocks();
+        saveState();
+      }
 
-window.removeStock=removeStock;
+      window.removeStock = removeStock;
 
-async function refreshStocks(targetSymbols){
-  const symbols=Array.isArray(targetSymbols)&&targetSymbols.length?targetSymbols:[...likedStocks];
-  if(!symbols.length){
-    setStockPanelMeta('尚未設定個股');
-    return;
-  }
-  setStockPanelMeta('個股資料更新中...');
-  const results=await Promise.allSettled(symbols.map(async symbol=>{
-    const snapshot=await fetchStockSnapshot(symbol);
-    return {symbol,snapshot};
-  }));
-  let successCount=0;
-  results.forEach((result,index)=>{
-    if(result.status==='fulfilled'){
-      const {symbol,snapshot}=result.value;
-      stockSnapshot[symbol]=snapshot;
-      successCount+=1;
-      return;
-    }
-    const symbol=symbols[index];
-    stockSnapshot[symbol]={yearHigh:NaN,currentPrice:NaN,growthRate:NaN};
-  });
-  renderStocks();
-  saveState();
-  if(successCount===symbols.length){
-    setStockPanelMeta(`已更新 ${successCount} 檔個股 ${formatPriceUpdateTime(new Date())}`,'var(--color-text-success)');
-  }else if(successCount>0){
-    setStockPanelMeta(`部分更新成功（${successCount}/${symbols.length}）`,'var(--color-text-danger)');
-  }else{
-    setStockPanelMeta('個股更新失敗，請稍後再試','var(--color-text-danger)');
-  }
-}
+      async function refreshStocks(targetSymbols) {
+        const symbols =
+          Array.isArray(targetSymbols) && targetSymbols.length
+            ? targetSymbols
+            : [...likedStocks];
+        if (!symbols.length) {
+          setStockPanelMeta("No stocks configured yet");
+          return;
+        }
+        setStockPanelMeta("Updating stock data...");
+        const results = await Promise.allSettled(
+          symbols.map(async (symbol) => {
+            const snapshot = await fetchStockSnapshot(symbol);
+            return { symbol, snapshot };
+          }),
+        );
+        let successCount = 0;
+        results.forEach((result, index) => {
+          if (result.status === "fulfilled") {
+            const { symbol, snapshot } = result.value;
+            stockSnapshot[symbol] = snapshot;
+            successCount += 1;
+            return;
+          }
+          const symbol = symbols[index];
+          stockSnapshot[symbol] = {
+            yearHigh: NaN,
+            currentPrice: NaN,
+            growthRate: NaN,
+          };
+        });
+        renderStocks();
+        saveState();
+        if (successCount === symbols.length) {
+          setStockPanelMeta(
+            `Updated ${successCount} stocks ${formatPriceUpdateTime(new Date())}`,
+            "success",
+          );
+        } else if (successCount > 0) {
+          setStockPanelMeta(
+            `Partial update succeeded (${successCount}/${symbols.length})`,
+            "fail",
+          );
+        } else {
+          setStockPanelMeta(
+            "Stock update failed, please try again later",
+            "fail",
+          );
+        }
+      }
 
-async function refreshLatestPrices(){
-  ETFs.forEach(etf=>setPriceMeta(etf.id,'更新中...'));
+      async function refreshLatestPrices() {
+        ETFs.forEach((etf) => setPriceMeta(etf.id, "Updating..."));
 
-  const results=await Promise.allSettled(
-    ETFs.map(async etf=>{
-      const price=await fetchLatestPrice(etf);
-      return {etf,price};
-    })
-  );
+        const results = await Promise.allSettled(
+          ETFs.map(async (etf) => {
+            const price = await fetchLatestPrice(etf);
+            return { etf, price };
+          }),
+        );
 
-  let hasSuccess=false;
-  results.forEach((result,index)=>{
-    if(result.status==='fulfilled'){
-      const {etf,price}=result.value;
-      prices[etf.id]=roundPriceForDisplay(price,etf.currency);
-      syncPriceInput(etf.id);
-      setPriceMeta(etf.id,`已更新歷史高點 ${formatPriceUpdateTime(new Date())}`,'var(--color-text-success)');
-      hasSuccess=true;
-      return;
-    }
+        let hasSuccess = false;
+        results.forEach((result, index) => {
+          if (result.status === "fulfilled") {
+            const { etf, price } = result.value;
+            prices[etf.id] = roundPriceForDisplay(price, etf.currency);
+            syncPriceInput(etf.id);
+            setPriceMeta(
+              etf.id,
+              `updated ${formatPriceUpdateTime(new Date())}`,
+              "success",
+            );
+            hasSuccess = true;
+            return;
+          }
 
-    const failedEtf=ETFs[index];
-    setPriceMeta(failedEtf.id,'自動更新失敗，保留目前值','var(--color-text-danger)');
-  });
+          const failedEtf = ETFs[index];
+          setPriceMeta(
+            failedEtf.id,
+            "Auto update failed, keeping current value",
+            "fail",
+          );
+        });
 
-  if(hasSuccess){
-    calc();
-    saveState();
-  }
-}
+        if (hasSuccess) {
+          calc();
+          saveState();
+        }
+      }
 
-function buildTargets(){
-  const el=document.getElementById('targets');
-  el.innerHTML='';
-  ETFs.forEach(etf=>{
-    const card=document.createElement('div');
-    card.className='target-card';
-    card.innerHTML=`
+      function buildTargets() {
+        const el = document.getElementById("targets");
+        el.innerHTML = "";
+        ETFs.forEach((etf) => {
+          const card = document.createElement("div");
+          card.className = "target-card";
+          card.innerHTML = `
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:1rem">
         <div style="font-size:15px;font-weight:500;color:var(--color-text-primary)">${etf.name}</div>
         <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:11px;color:var(--color-text-secondary)">Last top price</span>
+          <span style="font-size:11px;color:var(--color-text-secondary)">All-time High</span>
           <input type="number" id="p_${etf.id}" value="${prices[etf.id]}" style="width:80px;font-size:13px;font-weight:500;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 7px;background:var(--color-background-secondary);color:var(--color-text-primary)" oninput="prices['${etf.id}']=parseFloat(this.value)||0;calc();saveState()">
           <span style="font-size:11px;color:var(--color-text-secondary)">${etf.currency}</span>
         </div>
-        <div id="price_meta_${etf.id}" style="font-size:11px;color:var(--color-text-secondary)">使用目前儲存值</div>
+        <div id="price_meta_${etf.id}" style="font-size:11px;color:var(--color-text-secondary)"><span style="color: var(--color-text-secondary)">●</span> Using currently stored value</div>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed">
         <colgroup><col style="width:72px"><col style="width:88px"><col style="width:88px"><col style="width:96px"><col></colgroup>
         <thead>
           <tr style="border-bottom:0.5px solid var(--color-border-tertiary)">
-            <th style="text-align:left;padding:5px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">跌幅</th>
-            <th style="text-align:left;padding:5px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">入場價（低）</th>
-            <th style="text-align:left;padding:5px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">入場價（高）</th>
-            <th style="text-align:left;padding:5px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">期望投入</th>
-            <th style="text-align:left;padding:5px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">實際投入</th>
+            <th style="text-align:left;padding:5px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">Drop</th>
+            <th style="text-align:left;padding:5px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">Entry Price (Low)</th>
+            <th style="text-align:left;padding:5px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">Entry Price (High)</th>
+            <th style="text-align:left;padding:5px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">Expected Investment</th>
+            <th style="text-align:left;padding:5px 4px;color:var(--color-text-secondary);font-weight:400;font-size:12px">Actual Investment</th>
           </tr>
         </thead>
         <tbody id="rows_${etf.id}"></tbody>
       </table>`;
-    el.appendChild(card);
-  });
-}
-
-function calc(){
-  const tNtd=parseFloat(document.getElementById('target_ntd').value)||0;
-  const tUsd=parseFloat(document.getElementById('target_usd').value)||0;
-  const etfPct=(parseFloat(document.getElementById('etf_pct').value)||0)/100;
-  const cNtd=parseFloat(document.getElementById('cur_ntd').value)||0;
-  const cUsd=parseFloat(document.getElementById('cur_usd').value)||0;
-
-  const needNtd=cNtd-tNtd;
-  const needUsd=cUsd-tUsd;
-  const needEtfUsd=needUsd*etfPct;
-
-  const nNtdEl=document.getElementById('need_ntd_display');
-  const nUsdEl=document.getElementById('need_usd_display');
-  const nEtfUsdEl=document.getElementById('need_etf_usd_display');
-  const currentInvestEl=document.getElementById('current_invest_display');
-  const remainingEl=document.getElementById('remaining_display');
-  nNtdEl.textContent=(needNtd>=0?'+':'')+Math.round(needNtd).toLocaleString()+' NT$';
-  nNtdEl.style.color=colorVal(needNtd);
-  nUsdEl.textContent=(needUsd>=0?'+$':'−$')+Math.round(Math.abs(needUsd)).toLocaleString();
-  nUsdEl.style.color=colorVal(needUsd);
-  nEtfUsdEl.textContent=(needEtfUsd>=0?'+$':'−$')+Math.round(Math.abs(needEtfUsd)).toLocaleString();
-  nEtfUsdEl.style.color=colorVal(needEtfUsd);
-
-  let currentInvest=0;
-  ETFs.forEach(etf=>{
-    etf.ranges.forEach((_,i)=>{
-      const key=`${etf.id}_${i}`;
-      const v=parseFloat(actual[key]);
-      if(Number.isFinite(v)) currentInvest+=v;
-    });
-  });
-  const remaining=needNtd-currentInvest;
-  currentInvestEl.textContent=Math.round(currentInvest).toLocaleString()+' NT$';
-  currentInvestEl.style.color='var(--color-text-primary)';
-  remainingEl.textContent=(remaining>=0?'+':'')+Math.round(remaining).toLocaleString()+' NT$';
-  remainingEl.style.color=colorVal(remaining);
-
-  const qqqWeights=[40,40,20];
-  const vtiVtWeights=[40,40,20];
-  const tw50Weights=[5,30,30,25];
-
-  ETFs.forEach(etf=>{
-    const needVal=etf.needKey==='ntd'?needNtd:needUsd;
-    const perTime=needVal/etf.divs;
-
-    const p=prices[etf.id]||0;
-    const tbody=document.getElementById('rows_'+etf.id);
-    tbody.innerHTML='';
-    etf.ranges.forEach(([lo,hi],i)=>{
-      const priceLo=p*(1-hi/100);
-      const priceHi=p*(1-lo/100);
-      const key=`${etf.id}_${i}`;
-      if(actual[key]===undefined)actual[key]='';
-      let expectedInvest=perTime;
-      if(etf.id==='tw50'){
-        expectedInvest=needNtd*(tw50Weights[i]/100);
-      }else if(etf.id==='qqq'){
-        expectedInvest=needEtfUsd*0.5*(qqqWeights[i]/100);
-      }else if(etf.id==='vti'||etf.id==='vt'){
-        expectedInvest=needEtfUsd*0.25*(vtiVtWeights[i]/100);
+          el.appendChild(card);
+        });
       }
-      const tr=document.createElement('tr');
-      tr.style.borderBottom='0.5px solid var(--color-border-tertiary)';
-      tr.innerHTML=`
+
+      function calc() {
+        const tNtd =
+          parseFloat(document.getElementById("target_ntd").value) || 0;
+        const tUsd =
+          parseFloat(document.getElementById("target_usd").value) || 0;
+        const etfPct =
+          (parseFloat(document.getElementById("etf_pct").value) || 0) / 100;
+        const cNtd = parseFloat(document.getElementById("cur_ntd").value) || 0;
+        const cUsd = parseFloat(document.getElementById("cur_usd").value) || 0;
+
+        const needNtd = cNtd - tNtd;
+        const needUsd = cUsd - tUsd;
+        const needEtfUsd = needUsd * etfPct;
+
+        const nNtdEl = document.getElementById("need_ntd_display");
+        const nUsdEl = document.getElementById("need_usd_display");
+        const nEtfUsdEl = document.getElementById("need_etf_usd_display");
+        const currentInvestEl = document.getElementById(
+          "current_invest_display",
+        );
+        const currentInvestUsdEl = document.getElementById(
+          "current_invest_usd_display",
+        );
+        const remainingEl = document.getElementById("remaining_display");
+        const remainingUsdEl = document.getElementById("remaining_usd_display");
+        nNtdEl.textContent =
+          (needNtd >= 0 ? "+" : "") +
+          Math.round(needNtd).toLocaleString() +
+          " NT$";
+        nNtdEl.style.color = colorVal(needNtd);
+        nUsdEl.textContent =
+          (needUsd >= 0 ? "+$" : "−$") +
+          Math.round(Math.abs(needUsd)).toLocaleString();
+        nUsdEl.style.color = colorVal(needUsd);
+        nEtfUsdEl.textContent =
+          (needEtfUsd >= 0 ? "+$" : "−$") +
+          Math.round(Math.abs(needEtfUsd)).toLocaleString();
+        nEtfUsdEl.style.color = colorVal(needEtfUsd);
+
+        let currentInvestNtd = 0;
+        ETFs.forEach((etf) => {
+          etf.ranges.forEach((_, i) => {
+            const key = `${etf.id}_${i}`;
+            const v = parseFloat(actual[key]);
+            if (!Number.isFinite(v)) return;
+            if (etf.id === "tw50") currentInvestNtd += v;
+          });
+        });
+        let currentInvestUsd = 0;
+        ["qqq", "vti", "vt"].forEach((etfId) => {
+          const etf = ETFs.find((item) => item.id === etfId);
+          if (!etf) return;
+          etf.ranges.forEach((_, i) => {
+            const key = `${etf.id}_${i}`;
+            const v = parseFloat(actual[key]);
+            if (Number.isFinite(v)) currentInvestUsd += v;
+          });
+        });
+        likedStocks.forEach((symbol) => {
+          const v = parseFloat(stockActual[symbol]);
+          if (Number.isFinite(v)) currentInvestUsd += v;
+        });
+        const remaining = needNtd - currentInvestNtd;
+        const remainingUsd = needUsd - currentInvestUsd;
+        currentInvestEl.textContent =
+          Math.round(currentInvestNtd).toLocaleString() + " NT$";
+        currentInvestEl.style.color = "var(--color-text-primary)";
+        currentInvestUsdEl.textContent =
+          "$" + Math.round(currentInvestUsd).toLocaleString();
+        currentInvestUsdEl.style.color = "var(--color-text-primary)";
+        remainingEl.textContent =
+          (remaining >= 0 ? "+" : "") +
+          Math.round(remaining).toLocaleString() +
+          " NT$";
+        remainingEl.style.color = colorVal(remaining);
+        remainingUsdEl.textContent =
+          (remainingUsd >= 0 ? "+$" : "−$") +
+          Math.round(Math.abs(remainingUsd)).toLocaleString();
+        remainingUsdEl.style.color = colorVal(remainingUsd);
+
+        const qqqWeights = [40, 40, 20];
+        const vtiVtWeights = [40, 40, 20];
+        const tw50Weights = [5, 30, 30, 25];
+
+        ETFs.forEach((etf) => {
+          const needVal = etf.needKey === "ntd" ? needNtd : needUsd;
+          const perTime = needVal / etf.divs;
+
+          const p = prices[etf.id] || 0;
+          const tbody = document.getElementById("rows_" + etf.id);
+          tbody.innerHTML = "";
+          etf.ranges.forEach(([lo, hi], i) => {
+            const priceLo = p * (1 - hi / 100);
+            const priceHi = p * (1 - lo / 100);
+            const key = `${etf.id}_${i}`;
+            if (actual[key] === undefined) actual[key] = "";
+            let expectedInvest = perTime;
+            if (etf.id === "tw50") {
+              expectedInvest = needNtd * (tw50Weights[i] / 100);
+            } else if (etf.id === "qqq") {
+              expectedInvest = needEtfUsd * 0.5 * (qqqWeights[i] / 100);
+            } else if (etf.id === "vti" || etf.id === "vt") {
+              expectedInvest = needEtfUsd * 0.25 * (vtiVtWeights[i] / 100);
+            }
+            const tr = document.createElement("tr");
+            tr.style.borderBottom = "0.5px solid var(--color-border-tertiary)";
+            tr.innerHTML = `
         <td style="padding:7px 4px;color:var(--color-text-secondary)">${lo}–${hi}%</td>
-        <td style="padding:7px 4px;font-weight:500;color:var(--color-text-primary)">${fmt(priceLo,etf.currency)}</td>
-        <td style="padding:7px 4px;font-weight:500;color:var(--color-text-primary)">${fmt(priceHi,etf.currency)}</td>
-        <td style="padding:7px 4px;color:var(--color-text-secondary)">${fmtBig(expectedInvest,etf.currency)}</td>
+        <td style="padding:7px 4px;font-weight:500;color:var(--color-text-primary)">${fmt(priceLo, etf.currency)}</td>
+        <td style="padding:7px 4px;font-weight:500;color:var(--color-text-primary)">${fmt(priceHi, etf.currency)}</td>
+        <td style="padding:7px 4px;color:var(--color-text-secondary)">${fmtBig(expectedInvest, etf.currency)}</td>
         <td style="padding:7px 4px"><input type="number" placeholder="0" value="${actual[key]}" style="width:100%;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:3px 6px;background:var(--color-background-secondary);color:var(--color-text-primary)" oninput="actual['${key}']=this.value" onblur="calc();saveState()"></td>`;
-      tbody.appendChild(tr);
-    });
-  });
-}
+            tbody.appendChild(tr);
+          });
+        });
+      }
 
-// Add saveState to all top-level inputs
-['target_ntd','target_usd','etf_pct','stk_pct','cur_ntd','cur_usd'].forEach(id=>{
-  document.getElementById(id).addEventListener('input',()=>{ calc(); saveState(); });
-});
+      // Add saveState to all top-level inputs
+      [
+        "target_ntd",
+        "target_usd",
+        "etf_pct",
+        "stk_pct",
+        "cur_ntd",
+        "cur_usd",
+      ].forEach((id) => {
+        document.getElementById(id).addEventListener("input", () => {
+          calc();
+          saveState();
+        });
+      });
 
-restoreState();
-buildTargets();
-renderStocks();
-calc();
-refreshLatestPrices();
+      restoreState();
+      buildTargets();
+      renderStocks();
+      calc();
+      refreshLatestPrices();
 
-document.getElementById('add_stock_btn').addEventListener('click',()=>{
-  const input=document.getElementById('stock_symbol_input');
-  addStock(input.value);
-  input.value='';
-});
-document.getElementById('stock_symbol_input').addEventListener('keydown',event=>{
-  if(event.key==='Enter'){
-    event.preventDefault();
-    document.getElementById('add_stock_btn').click();
-  }
-});
-refreshStocks();
-</script>
-</body>
+      document.getElementById("add_stock_btn").addEventListener("click", () => {
+        const input = document.getElementById("stock_symbol_input");
+        addStock(input.value);
+        input.value = "";
+      });
+      document
+        .getElementById("stock_symbol_input")
+        .addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            document.getElementById("add_stock_btn").click();
+          }
+        });
+      refreshStocks();
+    </script>
+  </body>
 </html>
