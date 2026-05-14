@@ -100,6 +100,19 @@
       .summary-card-wide {
         grid-column: span 2;
       }
+      .summary-card-double {
+        grid-column: span 2;
+      }
+      .input-with-unit {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .unit-label {
+        font-size: 12px;
+        color: var(--color-text-secondary);
+        white-space: nowrap;
+      }
       .summary-head {
         display: flex;
         align-items: flex-start;
@@ -173,7 +186,7 @@
       <div class="panel">
         <div class="top-input-row">
           <div>
-            <div class="section-title">Target Allocation</div>
+            <div class="section-title">Target</div>
             <div
               style="
                 display: grid;
@@ -196,23 +209,26 @@
                     margin-bottom: 5px;
                   "
                 >
-                  Target TWD
+                  Target TWD (NT$)
                 </div>
-                <input
-                  type="number"
-                  id="target_ntd"
-                  value="800000"
-                  style="
-                    width: 100%;
-                    font-size: 14px;
-                    font-weight: 500;
-                    border: none;
-                    background: transparent;
-                    color: var(--color-text-primary);
-                    outline: none;
-                  "
-                  oninput="calc()"
-                />
+                <div class="input-with-unit">
+                  <input
+                    type="number"
+                    id="target_ntd"
+                    value="800000"
+                    style="
+                      width: 100%;
+                      font-size: 14px;
+                      font-weight: 500;
+                      border: none;
+                      background: transparent;
+                      color: var(--color-text-primary);
+                      outline: none;
+                    "
+                    oninput="calc()"
+                  />
+                  <span class="unit-label">NT$</span>
+                </div>
               </div>
               <div
                 style="
@@ -228,23 +244,26 @@
                     margin-bottom: 5px;
                   "
                 >
-                  Target USD
+                  Target USD ($)
                 </div>
-                <input
-                  type="number"
-                  id="target_usd"
-                  value="15000"
-                  style="
-                    width: 100%;
-                    font-size: 14px;
-                    font-weight: 500;
-                    border: none;
-                    background: transparent;
-                    color: var(--color-text-primary);
-                    outline: none;
-                  "
-                  oninput="calc()"
-                />
+                <div class="input-with-unit">
+                  <input
+                    type="number"
+                    id="target_usd"
+                    value="15000"
+                    style="
+                      width: 100%;
+                      font-size: 14px;
+                      font-weight: 500;
+                      border: none;
+                      background: transparent;
+                      color: var(--color-text-primary);
+                      outline: none;
+                    "
+                    oninput="calc()"
+                  />
+                  <span class="unit-label">$</span>
+                </div>
               </div>
               <div
                 style="
@@ -262,21 +281,24 @@
                 >
                   Target ETF(%)
                 </div>
-                <input
-                  type="number"
-                  id="etf_pct"
-                  value="70"
-                  style="
-                    width: 100%;
-                    font-size: 14px;
-                    font-weight: 500;
-                    border: none;
-                    background: transparent;
-                    color: var(--color-text-primary);
-                    outline: none;
-                  "
-                  oninput="calc()"
-                />
+                <div class="input-with-unit">
+                  <input
+                    type="number"
+                    id="etf_pct"
+                    value="70"
+                    style="
+                      width: 100%;
+                      font-size: 14px;
+                      font-weight: 500;
+                      border: none;
+                      background: transparent;
+                      color: var(--color-text-primary);
+                      outline: none;
+                    "
+                    oninput="calc()"
+                  />
+                  <span class="unit-label">%</span>
+                </div>
               </div>
               <div
                 style="
@@ -292,30 +314,31 @@
                     margin-bottom: 5px;
                   "
                 >
-                  Target indvd Stock(%)
+                  Target Stocks(%)
                 </div>
-                <input
-                  type="number"
-                  id="stk_pct"
-                  value="30"
-                  style="
-                    width: 100%;
-                    font-size: 14px;
-                    font-weight: 500;
-                    border: none;
-                    background: transparent;
-                    color: var(--color-text-primary);
-                    outline: none;
-                  "
-                  oninput="calc()"
-                />
+                <div class="input-with-unit">
+                  <input
+                    type="number"
+                    id="stk_pct"
+                    value="30"
+                    style="
+                      width: 100%;
+                      font-size: 14px;
+                      font-weight: 500;
+                      border: none;
+                      background: transparent;
+                      color: var(--color-text-primary);
+                      outline: none;
+                    "
+                    oninput="calc()"
+                  />
+                  <span class="unit-label">%</span>
+                </div>
               </div>
             </div>
           </div>
           <div>
-            <div class="section-title">
-              Current Cash in Latest Month (from monthly overview)
-            </div>
+            <div class="section-title">Current Cash in Latest Month</div>
             <div
               style="
                 display: grid;
@@ -338,23 +361,26 @@
                     margin-bottom: 5px;
                   "
                 >
-                  Current TWD
+                  Current TWD (NT$)
                 </div>
-                <input
-                  type="number"
-                  id="cur_ntd"
-                  value="0"
-                  style="
-                    width: 100%;
-                    font-size: 14px;
-                    font-weight: 500;
-                    border: none;
-                    background: transparent;
-                    color: var(--color-text-primary);
-                    outline: none;
-                  "
-                  oninput="calc()"
-                />
+                <div class="input-with-unit">
+                  <input
+                    type="number"
+                    id="cur_ntd"
+                    value="0"
+                    style="
+                      width: 100%;
+                      font-size: 14px;
+                      font-weight: 500;
+                      border: none;
+                      background: transparent;
+                      color: var(--color-text-primary);
+                      outline: none;
+                    "
+                    oninput="calc()"
+                  />
+                  <span class="unit-label">NT$</span>
+                </div>
               </div>
               <div
                 style="
@@ -370,23 +396,26 @@
                     margin-bottom: 5px;
                   "
                 >
-                  Current USD
+                  Current USD ($)
                 </div>
-                <input
-                  type="number"
-                  id="cur_usd"
-                  value="0"
-                  style="
-                    width: 100%;
-                    font-size: 14px;
-                    font-weight: 500;
-                    border: none;
-                    background: transparent;
-                    color: var(--color-text-primary);
-                    outline: none;
-                  "
-                  oninput="calc()"
-                />
+                <div class="input-with-unit">
+                  <input
+                    type="number"
+                    id="cur_usd"
+                    value="0"
+                    style="
+                      width: 100%;
+                      font-size: 14px;
+                      font-weight: 500;
+                      border: none;
+                      background: transparent;
+                      color: var(--color-text-primary);
+                      outline: none;
+                    "
+                    oninput="calc()"
+                  />
+                  <span class="unit-label">$</span>
+                </div>
               </div>
             </div>
           </div>
@@ -394,11 +423,10 @@
       </div>
 
       <div class="panel">
-        <div class="section-title">
-          Investment Summary and Suggested Allocation
-        </div>
+        <div class="section-title">Investment Tracking</div>
         <div class="summary-grid">
           <div
+            class="summary-card-double"
             style="
               border-radius: var(--border-radius-md);
               padding: 1rem;
@@ -407,7 +435,7 @@
           >
             <div class="summary-head">
               <div style="font-size: 11px; color: var(--color-text-secondary)">
-                Additional TWD to Invest
+                TWD to Invest
               </div>
               <div class="summary-note">(Current TWD − Target TWD)</div>
             </div>
@@ -427,7 +455,7 @@
           >
             <div class="summary-head">
               <div style="font-size: 11px; color: var(--color-text-secondary)">
-                Additional USD to Invest
+                USD to Invest
               </div>
               <div class="summary-note">(Current USD − Target USD)</div>
             </div>
@@ -439,7 +467,6 @@
             </div>
           </div>
           <div
-            class="summary-card-wide"
             style="
               border-radius: var(--border-radius-md);
               padding: 1rem;
@@ -448,11 +475,9 @@
           >
             <div class="summary-head">
               <div style="font-size: 11px; color: var(--color-text-secondary)">
-                Additional ETF USD to Invest
+                USD to invest in ETF
               </div>
-              <div class="summary-note">
-                (Additional USD to Invest × Target ETF%)
-              </div>
+              <div class="summary-note">(USD to Invest × Target ETF%)</div>
             </div>
             <div
               id="need_etf_usd_display"
@@ -510,7 +535,7 @@
           >
             <div class="summary-head">
               <div style="font-size: 11px; color: var(--color-text-secondary)">
-                Remaining Amount(NT$)
+                Remains(NT$)
               </div>
               <div class="summary-note"></div>
             </div>
@@ -530,7 +555,7 @@
           >
             <div class="summary-head">
               <div style="font-size: 11px; color: var(--color-text-secondary)">
-                Remaining Amount(US$)
+                Remains(US$)
               </div>
               <div class="summary-note"></div>
             </div>
@@ -1016,17 +1041,11 @@
           .trim()
           .toUpperCase();
         if (!normalized) {
-          setStockPanelMeta(
-            "Please enter a stock symbol",
-            "fail",
-          );
+          setStockPanelMeta("Please enter a stock symbol", "fail");
           return;
         }
         if (!STOCK_SYMBOL_PATTERN.test(normalized)) {
-          setStockPanelMeta(
-            "Invalid symbol format",
-            "fail",
-          );
+          setStockPanelMeta("Invalid symbol format", "fail");
           return;
         }
         if (!ALLOWED_STOCK_SYMBOLS.has(normalized)) {
@@ -1037,10 +1056,7 @@
           return;
         }
         if (likedStocks.includes(normalized)) {
-          setStockPanelMeta(
-            `${normalized} already exists`,
-            "fail",
-          );
+          setStockPanelMeta(`${normalized} already exists`, "fail");
           return;
         }
         likedStocks.push(normalized);
